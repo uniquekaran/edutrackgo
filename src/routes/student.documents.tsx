@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { FileText, Upload, CheckCircle2, Clock, XCircle, Loader2, ExternalLink } from "lucide-react";
+import { FileText, Upload, CheckCircle2, Clock, XCircle, Loader2, Eye, X } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { formatISTDateTime } from "@/lib/format";
 
 export const Route = createFileRoute("/student/documents")({
   head: () => ({ meta: [{ title: "Documents — EduTrack" }] }),
