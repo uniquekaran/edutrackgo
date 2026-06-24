@@ -382,7 +382,7 @@ function StudentProfilePanel({
 
 /* ========================== Tab 2: Documents Hub ========================== */
 
-function DocumentsHub({ docs }: { docs: DocRow[] }) {
+function DocumentsHub({ docs, onPreview }: { docs: DocRow[]; onPreview: (d: DocRow) => void }) {
   const pending = docs.filter((d) => d.status === "pending");
   const recent = docs.filter((d) => d.status !== "pending").slice(0, 20);
 
