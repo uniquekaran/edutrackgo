@@ -149,39 +149,81 @@ function Roster() {
 }
 
 function Verify() {
-  const docs = useStore((s) => s.documents.filter((d) => d.status === "pending"));
-  const recent = useStore((s) => s.documents.filter((d) => d.status !== "pending").slice(0, 8));
+  const [docs, setDocs] = useState<AdminDocRow[]>([]);
 
-  function approve(id: string) { setDocStatus(id, "verified"); toast.success("Document approved"); }
-  function reject(id: string) { setDocStatus(id, "rejected"); toast.error("Document rejected"); }
+  useEffect(() => {
+    async function load() {
+      const { data, error } = await supabase
+        .from("documents")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) {
+        toast.error("Couldn't load documents");
+        return;
+      }
+      setDocs((data ?? []) as AdminDocRow[]);
+    }
+    load();
+    const ch = supabase
+      .channel("documents:admin-verify")
+      .on("postgres_changes", { event: "*", schema: "public", table: "documents" }, () => load())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
+
+  const pending = docs.filter((d) => d.status === "pending");
+  const recent = docs.filter((d) => d.status !== "pending").slice(0, 8);
+
+  async function setStatus(id: string, status: DocStatus) {
+    const { error } = await supabase.from("documents").update({ status }).eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    if (status === "verified") toast.success("Document approved");
+    else toast.error("Document rejected");
+  }
 
   return (
     <div className="px-5 pt-5 space-y-5">
       <section>
         <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-2">Pending requests</h2>
         <div className="space-y-3">
-          {docs.length === 0 && (
+          {pending.length === 0 && (
             <div className="rounded-2xl bg-surface shadow-soft p-6 text-center">
               <ShieldCheck className="w-7 h-7 mx-auto text-success" />
               <p className="mt-2 text-sm">All caught up.</p>
             </div>
           )}
-          {docs.map((d) => (
+          {pending.map((d) => (
             <div key={d.id} className="rounded-2xl bg-surface shadow-soft p-4">
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-accent text-primary grid place-items-center shrink-0">
-                  <ShieldCheck className="w-4 h-4" />
+                  <FileText className="w-4 h-4" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold truncate">{d.ownerName}</p>
-                  <p className="text-[11px] text-muted-foreground">{CATEGORY_LABELS[d.category]} · {d.fileName}</p>
+                  <p className="text-sm font-bold truncate">{d.student_name}</p>
+                  <p className="text-[11px] text-muted-foreground truncate">
+                    {d.document_type} · {new Date(d.created_at).toLocaleDateString()}
+                  </p>
                 </div>
+                {d.file_url && (
+                  <a
+                    href={d.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 rounded-lg grid place-items-center text-muted-foreground hover:bg-accent/50"
+                    aria-label="Open file"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                )}
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <button onClick={() => reject(d.id)} className="h-11 rounded-xl bg-destructive/10 text-destructive font-bold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98]">
+                <button onClick={() => setStatus(d.id, "rejected")} className="h-11 rounded-xl bg-destructive/10 text-destructive font-bold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98]">
                   <XCircle className="w-4 h-4" /> Reject
                 </button>
-                <button onClick={() => approve(d.id)} className="h-11 rounded-xl bg-success text-success-foreground font-bold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98]">
+                <button onClick={() => setStatus(d.id, "verified")} className="h-11 rounded-xl bg-success text-success-foreground font-bold text-sm flex items-center justify-center gap-1.5 active:scale-[0.98]">
                   <CheckCircle2 className="w-4 h-4" /> Approve
                 </button>
               </div>
@@ -197,8 +239,8 @@ function Verify() {
             {recent.map((d) => (
               <div key={d.id} className="flex items-center gap-3 px-4 py-3">
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate">{d.ownerName}</p>
-                  <p className="text-[11px] text-muted-foreground truncate">{d.fileName}</p>
+                  <p className="text-sm font-semibold truncate">{d.student_name}</p>
+                  <p className="text-[11px] text-muted-foreground truncate">{d.document_type}</p>
                 </div>
                 <StatusTag status={d.status} />
               </div>
