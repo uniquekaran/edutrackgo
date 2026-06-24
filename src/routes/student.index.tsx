@@ -180,5 +180,5 @@ function calcStreak(dates: string[]) {
   return s;
 }
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+  return formatISTDay(d);
 }
