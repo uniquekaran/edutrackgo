@@ -2,7 +2,8 @@ import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Users, ShieldCheck, Megaphone, LogOut, GraduationCap, CheckCircle2, XCircle, Send } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
-import { store, useStore, signOut, attendanceStats, setDocStatus, broadcast, CATEGORY_LABELS } from "@/lib/store";
+import { store, useStore, signOut as clearLocalUser, attendanceStats, setDocStatus, broadcast, CATEGORY_LABELS } from "@/lib/store";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { StatusTag } from "./student.documents";
 
