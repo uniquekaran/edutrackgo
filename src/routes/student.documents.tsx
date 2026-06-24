@@ -50,18 +50,35 @@ function Documents() {
     let active = true;
 
     async function load() {
-      const { data, error } = await supabase
-        .from("documents")
-        .select("*")
-        .eq("student_id", user.id)
-        .order("created_at", { ascending: false });
-      if (!active) return;
-      if (error) {
-        toast.error("Couldn't load documents");
-      } else {
-        setDocs((data ?? []) as DocRow[]);
+      try {
+        const { data, error } = await supabase
+          .from("documents")
+          .select("*")
+          .eq("student_id", user.id)
+          .order("created_at", { ascending: false });
+        if (!active) return;
+        if (error) throw error;
+        const next = (data ?? []) as DocRow[];
+        // Detect status transitions for live toast
+        const prev = prevStatusRef.current;
+        if (prev.size > 0) {
+          for (const d of next) {
+            const before = prev.get(d.id);
+            if (before && before !== d.status) {
+              if (d.status === "verified") toast.success(`Document Status Updated · ${d.document_type} verified`);
+              else if (d.status === "rejected") toast.error(`Document Status Updated · ${d.document_type} rejected`);
+            }
+          }
+        }
+        prevStatusRef.current = new Map(next.map((d) => [d.id, d.status]));
+        setDocs(next);
+      } catch (err) {
+        if (!active) return;
+        console.warn("documents load failed", err);
+        toast.error("Couldn't load documents — showing offline state");
+      } finally {
+        if (active) setLoading(false);
       }
-      setLoading(false);
     }
     load();
 
