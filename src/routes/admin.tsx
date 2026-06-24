@@ -45,6 +45,7 @@ function AdminConsole() {
   const [docs, setDocs] = useState<DocRow[] | null>(null);
   const [tab, setTab] = useState<Tab>("roster");
   const [selectedStudent, setSelectedStudent] = useState<StudentRow | null>(null);
+  const [preview, setPreview] = useState<DocRow | null>(null);
 
   // Auth gate: wait for hydration; bypass for the configured admin email.
   const isAuthorized = useMemo(() => {
