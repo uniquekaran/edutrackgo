@@ -294,8 +294,8 @@ function Roster({
 /* =================== Student Profile + Docs side-panel =================== */
 
 function StudentProfilePanel({
-  student, docs, onClose,
-}: { student: StudentRow; docs: DocRow[]; onClose: () => void }) {
+  student, docs, onClose, onPreview,
+}: { student: StudentRow; docs: DocRow[]; onClose: () => void; onPreview: (d: DocRow) => void }) {
   async function setStatus(id: string, status: DocStatus) {
     const { error } = await supabase.from("documents").update({ status }).eq("id", id);
     if (error) { toast.error(error.message); return; }
