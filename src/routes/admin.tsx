@@ -222,7 +222,7 @@ function Broadcast({ authorName }: { authorName: string }) {
           </div>
           <button
             onClick={push}
-            className="w-full h-13 py-3.5 rounded-2xl gradient-primary text-primary-foreground font-bold shadow-elevated active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
+            className="w-full h-14 py-3.5 rounded-2xl gradient-primary text-primary-foreground font-bold shadow-elevated active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
           >
             <Send className="w-4 h-4" /> Push Broadcast
           </button>

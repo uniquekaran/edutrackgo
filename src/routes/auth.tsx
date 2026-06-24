@@ -109,7 +109,7 @@ function AuthPage() {
 
             <button
               type="submit"
-              className="mt-4 w-full h-13 py-3.5 rounded-2xl gradient-primary text-primary-foreground font-bold shadow-elevated active:scale-[0.98] transition-transform"
+              className="mt-4 w-full h-14 py-3.5 rounded-2xl gradient-primary text-primary-foreground font-bold shadow-elevated active:scale-[0.98] transition-transform"
             >
               {mode === "login" ? "Sign In" : "Create Account"}
             </button>

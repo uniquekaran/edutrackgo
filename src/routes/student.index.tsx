@@ -54,7 +54,7 @@ function StudentDashboard() {
           <button
             onClick={handleMark}
             disabled={markedToday}
-            className={`mt-5 w-full h-13 py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
+            className={`mt-5 w-full h-14 py-3.5 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.98] ${
               markedToday
                 ? "bg-success/15 text-success cursor-not-allowed"
                 : "gradient-primary text-primary-foreground shadow-elevated"
