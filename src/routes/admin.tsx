@@ -34,7 +34,23 @@ function AdminConsole() {
   const navigate = useNavigate();
   const user = useStore((s) => s.user)!;
   const users = useStore((s) => s.users.filter((u) => u.role === "student"));
-  const pendingCount = useStore((s) => s.documents.filter((d) => d.status === "pending").length);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    async function refresh() {
+      const { count } = await supabase
+        .from("documents")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending");
+      setPendingCount(count ?? 0);
+    }
+    refresh();
+    const ch = supabase
+      .channel("documents:admin-kpi")
+      .on("postgres_changes", { event: "*", schema: "public", table: "documents" }, () => refresh())
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
   const [tab, setTab] = useState<Tab>("roster");
 
   return (
