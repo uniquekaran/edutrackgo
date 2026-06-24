@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   Users, ShieldCheck, Megaphone, LogOut, CheckCircle2, XCircle, Send,
-  ExternalLink, FileText, Search, ChevronRight, X, Loader2, BarChart3,
+  FileText, Search, ChevronRight, X, Loader2, BarChart3,
   CalendarCheck, AlertTriangle,
 } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
@@ -45,6 +45,7 @@ function AdminConsole() {
   const [docs, setDocs] = useState<DocRow[] | null>(null);
   const [tab, setTab] = useState<Tab>("roster");
   const [selectedStudent, setSelectedStudent] = useState<StudentRow | null>(null);
+  const [preview, setPreview] = useState<DocRow | null>(null);
 
   // Auth gate: wait for hydration; bypass for the configured admin email.
   const isAuthorized = useMemo(() => {
@@ -104,8 +105,8 @@ function AdminConsole() {
   }, [isAuthorized]);
 
   // --- Loading / gating UI ---
-  if (isAuthorized === null) return <FullScreenSpinner label="Verifying admin access…" />;
-  if (isAuthorized === false) return <FullScreenSpinner label="Redirecting…" />;
+  if (isAuthorized === null) return <FullScreenSpinner label="Loading dashboard…" />;
+  if (isAuthorized === false) return <FullScreenSpinner label="Loading dashboard…" />;
   if (bootError) {
     return (
       <MobileShell>
@@ -167,7 +168,7 @@ function AdminConsole() {
 
       <div className="flex-1 overflow-y-auto pb-8 animate-in fade-in duration-200" key={tab}>
         {tab === "roster" && <Roster students={students} docs={docs} onOpen={setSelectedStudent} />}
-        {tab === "documents" && <DocumentsHub docs={docs} />}
+        {tab === "documents" && <DocumentsHub docs={docs} onPreview={setPreview} />}
         {tab === "analytics" && <Analytics students={students} docs={docs} authorName={user.name ?? "Admin"} />}
       </div>
 
@@ -176,8 +177,11 @@ function AdminConsole() {
           student={selectedStudent}
           docs={docs.filter((d) => d.student_id === selectedStudent.id)}
           onClose={() => setSelectedStudent(null)}
+          onPreview={setPreview}
         />
       )}
+
+      {preview && <DocPreviewModal doc={preview} onClose={() => setPreview(null)} />}
     </MobileShell>
   );
 }
@@ -290,8 +294,8 @@ function Roster({
 /* =================== Student Profile + Docs side-panel =================== */
 
 function StudentProfilePanel({
-  student, docs, onClose,
-}: { student: StudentRow; docs: DocRow[]; onClose: () => void }) {
+  student, docs, onClose, onPreview,
+}: { student: StudentRow; docs: DocRow[]; onClose: () => void; onPreview: (d: DocRow) => void }) {
   async function setStatus(id: string, status: DocStatus) {
     const { error } = await supabase.from("documents").update({ status }).eq("id", id);
     if (error) { toast.error(error.message); return; }
@@ -344,14 +348,12 @@ function StudentProfilePanel({
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2">
                 {d.file_url ? (
-                  <a
-                    href={d.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="h-10 rounded-xl bg-surface border border-border font-bold text-xs flex items-center justify-center gap-1.5"
+                  <button
+                    onClick={() => onPreview(d)}
+                    className="h-10 rounded-xl bg-surface border border-border font-bold text-xs flex items-center justify-center gap-1.5 active:scale-[0.98]"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" /> View
-                  </a>
+                    <FileText className="w-3.5 h-3.5" /> View
+                  </button>
                 ) : (
                   <div className="h-10 rounded-xl bg-surface/50 border border-dashed border-border text-muted-foreground font-bold text-xs flex items-center justify-center">
                     No file
@@ -380,7 +382,7 @@ function StudentProfilePanel({
 
 /* ========================== Tab 2: Documents Hub ========================== */
 
-function DocumentsHub({ docs }: { docs: DocRow[] }) {
+function DocumentsHub({ docs, onPreview }: { docs: DocRow[]; onPreview: (d: DocRow) => void }) {
   const pending = docs.filter((d) => d.status === "pending");
   const recent = docs.filter((d) => d.status !== "pending").slice(0, 20);
 
@@ -416,15 +418,13 @@ function DocumentsHub({ docs }: { docs: DocRow[] }) {
                   </p>
                 </div>
                 {d.file_url && (
-                  <a
-                    href={d.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => onPreview(d)}
                     className="w-8 h-8 rounded-lg grid place-items-center text-muted-foreground hover:bg-accent/50"
-                    aria-label="Open file"
+                    aria-label="Preview file"
                   >
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
+                    <FileText className="w-4 h-4" />
+                  </button>
                 )}
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">
@@ -453,15 +453,13 @@ function DocumentsHub({ docs }: { docs: DocRow[] }) {
                   <p className="text-[11px] text-muted-foreground truncate">{d.document_type}</p>
                 </div>
                 {d.file_url && (
-                  <a
-                    href={d.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => onPreview(d)}
                     className="w-8 h-8 rounded-lg grid place-items-center text-muted-foreground hover:bg-accent/50"
-                    aria-label="Open file"
+                    aria-label="Preview file"
                   >
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
+                    <FileText className="w-4 h-4" />
+                  </button>
                 )}
                 <StatusTag status={d.status} />
               </div>
@@ -593,6 +591,69 @@ function MetricCard({ label, value, icon }: { label: string; value: number; icon
         <p className="text-[10px] uppercase tracking-wider font-bold">{label}</p>
       </div>
       <p className="text-2xl font-black mt-1">{value}</p>
+    </div>
+  );
+}
+
+/* ============================ Doc Preview Modal ============================ */
+
+function DocPreviewModal({ doc, onClose }: { doc: DocRow; onClose: () => void }) {
+  const url = doc.file_url;
+  const lower = url.split("?")[0].toLowerCase();
+  const isImage = /\.(png|jpe?g|gif|webp|bmp|svg|avif)$/.test(lower) || url.startsWith("data:image") || url.startsWith("blob:");
+  const isPdf = /\.pdf$/.test(lower) || url.startsWith("data:application/pdf");
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4 animate-in fade-in"
+      onClick={onClose}
+    >
+      <div
+        className="bg-surface w-full max-w-md max-h-[92vh] rounded-3xl shadow-elevated flex flex-col overflow-hidden animate-in zoom-in-95 duration-150"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center gap-3 px-5 py-3 border-b border-border">
+          <div className="w-9 h-9 rounded-xl bg-accent text-primary grid place-items-center shrink-0">
+            <FileText className="w-4 h-4" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold truncate">{doc.document_type}</p>
+            <p className="text-[11px] text-muted-foreground truncate">{doc.student_name}</p>
+          </div>
+          <StatusTag status={doc.status} />
+        </div>
+
+        <div className="flex-1 overflow-auto bg-secondary/40 grid place-items-center p-3">
+          {isImage ? (
+            <img
+              src={url}
+              alt={doc.document_type}
+              className="max-w-full max-h-[70vh] rounded-2xl border border-border bg-white object-contain"
+            />
+          ) : isPdf ? (
+            <iframe
+              src={url}
+              title={doc.document_type}
+              className="w-full h-[70vh] rounded-2xl border border-border bg-white"
+            />
+          ) : (
+            <div className="text-center p-8">
+              <FileText className="w-10 h-10 mx-auto text-muted-foreground" />
+              <p className="mt-3 text-sm font-semibold">Preview not available</p>
+              <p className="mt-1 text-xs text-muted-foreground break-all">{url}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="p-4 border-t border-border">
+          <button
+            onClick={onClose}
+            className="w-full h-11 rounded-xl gradient-primary text-primary-foreground font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98]"
+          >
+            <X className="w-4 h-4" /> Close Preview
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
