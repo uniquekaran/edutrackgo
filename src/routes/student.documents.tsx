@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
 import { FileText, IdCard, ScrollText, Upload, CheckCircle2, Clock, XCircle } from "lucide-react";
-import { uploadDocument, useStore, CATEGORY_LABELS, type DocCategory, type DocStatus } from "@/lib/store";
+import { uploadDocument, useStore, CATEGORY_LABELS, type DocCategory, type DocStatus, type DocumentItem } from "@/lib/store";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/student/documents")({
@@ -43,7 +43,7 @@ function CategoryCard({
   ownerName,
 }: {
   cat: { key: DocCategory; icon: React.ReactNode; hint: string };
-  items: ReturnType<typeof useStore<any>>;
+  items: DocumentItem[];
   ownerId: string;
   ownerName: string;
 }) {
@@ -75,7 +75,7 @@ function CategoryCard({
       </div>
       {items.length > 0 && (
         <ul className="border-t border-border divide-y divide-border">
-          {items.map((d: any) => (
+          {items.map((d) => (
             <li key={d.id} className="flex items-center gap-3 px-4 py-3">
               <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
               <p className="flex-1 min-w-0 truncate text-sm font-medium">{d.fileName}</p>
