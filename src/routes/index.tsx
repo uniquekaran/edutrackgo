@@ -49,10 +49,10 @@ function Welcome() {
               to="/auth"
               className="flex items-center justify-center gap-2 w-full h-14 rounded-2xl bg-white text-primary font-bold shadow-elevated active:scale-[0.98] transition-transform"
             >
-              Get Started <ArrowRight className="w-5 h-5" />
+              Continue with Google <ArrowRight className="w-5 h-5" />
             </Link>
             <p className="text-center text-xs opacity-80">
-              Designed for students & administrators.
+              One tap. No passwords. New users join as students.
             </p>
           </div>
         </div>
