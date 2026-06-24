@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   Users, ShieldCheck, Megaphone, LogOut, CheckCircle2, XCircle, Send,
-  ExternalLink, FileText, Search, ChevronRight, X, Loader2, BarChart3,
+  FileText, Search, ChevronRight, X, Loader2, BarChart3,
   CalendarCheck, AlertTriangle,
 } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
