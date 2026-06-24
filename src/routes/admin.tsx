@@ -346,7 +346,7 @@ function StudentProfilePanel({
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold truncate">{d.document_type}</p>
                   <p className="text-[11px] text-muted-foreground">
-                    {new Date(d.created_at).toLocaleDateString()}
+                    {formatISTDate(d.created_at)}
                   </p>
                 </div>
                 <StatusTag status={d.status} />
