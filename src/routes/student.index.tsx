@@ -1,8 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Calendar, CheckCircle2, TrendingUp, Sparkles } from "lucide-react";
-import { attendanceStats, markAttendance, useStore } from "@/lib/store";
+import { Calendar, CheckCircle2, TrendingUp, Sparkles, LogOut } from "lucide-react";
+import { attendanceStats, markAttendance, signOut as clearLocalUser, useStore } from "@/lib/store";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { formatISTDay } from "@/lib/format";
 
 export const Route = createFileRoute("/student/")({
   head: () => ({ meta: [{ title: "Dashboard — EduTrack" }] }),
@@ -10,6 +12,7 @@ export const Route = createFileRoute("/student/")({
 });
 
 function StudentDashboard() {
+  const navigate = useNavigate();
   const user = useStore((s) => s.user)!;
   const attendance = useStore((s) => s.attendance);
 
@@ -28,16 +31,34 @@ function StudentDashboard() {
 
   function handleMark() {
     const ok = markAttendance(user.id);
-    if (ok) toast.success("Attendance marked for today");
+    if (ok) toast.success("Attendance Successfully Marked!");
     else toast.info("You've already marked attendance today");
+  }
+
+  async function handleSignOut() {
+    try { await supabase.auth.signOut(); } catch { /* ignore */ }
+    clearLocalUser();
+    toast.success("Signed out");
+    navigate({ to: "/auth" });
   }
 
   return (
     <div className="pb-6">
       <header className="px-6 pt-10 pb-6 gradient-primary text-primary-foreground rounded-b-[2rem]">
-        <p className="text-xs uppercase tracking-widest opacity-80">{new Date().toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}</p>
-        <h1 className="mt-1 text-2xl font-black">Hi, {user.name.split(" ")[0]} 👋</h1>
-        <p className="text-sm opacity-90 mt-0.5">{user.department}</p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs uppercase tracking-widest opacity-80">{formatISTDay(new Date())}</p>
+            <h1 className="mt-1 text-2xl font-black truncate">Hi, {user.name?.split(" ")[0] ?? "there"} 👋</h1>
+            <p className="text-sm opacity-90 mt-0.5 truncate">{user.department ?? "Student"}</p>
+          </div>
+          <button
+            onClick={handleSignOut}
+            aria-label="Sign out"
+            className="w-10 h-10 rounded-xl bg-white/15 grid place-items-center shrink-0 active:scale-95 transition-transform"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
       </header>
 
       <section className="px-5 -mt-12">
@@ -159,5 +180,5 @@ function calcStreak(dates: string[]) {
   return s;
 }
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+  return formatISTDay(d);
 }
