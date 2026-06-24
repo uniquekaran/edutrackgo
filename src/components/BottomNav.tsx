@@ -28,7 +28,7 @@ export function BottomNav() {
           );
         })}
         <button
-          onClick={() => { signOut(); navigate({ to: "/auth" }); }}
+          onClick={async () => { await supabase.auth.signOut(); clearLocalUser(); navigate({ to: "/auth" }); }}
           className="flex-1 flex flex-col items-center gap-1 py-2 px-1 rounded-xl text-muted-foreground hover:text-destructive transition-colors"
         >
           <LogOut className="w-5 h-5" />
