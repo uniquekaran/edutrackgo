@@ -348,14 +348,12 @@ function StudentProfilePanel({
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2">
                 {d.file_url ? (
-                  <a
-                    href={d.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="h-10 rounded-xl bg-surface border border-border font-bold text-xs flex items-center justify-center gap-1.5"
+                  <button
+                    onClick={() => onPreview(d)}
+                    className="h-10 rounded-xl bg-surface border border-border font-bold text-xs flex items-center justify-center gap-1.5 active:scale-[0.98]"
                   >
-                    <ExternalLink className="w-3.5 h-3.5" /> View
-                  </a>
+                    <FileText className="w-3.5 h-3.5" /> View
+                  </button>
                 ) : (
                   <div className="h-10 rounded-xl bg-surface/50 border border-dashed border-border text-muted-foreground font-bold text-xs flex items-center justify-center">
                     No file
