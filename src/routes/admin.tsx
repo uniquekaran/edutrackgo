@@ -36,7 +36,7 @@ function AdminConsole() {
             <h1 className="text-2xl font-black mt-0.5">Hello, {user.name.split(" ")[0]}</h1>
           </div>
           <button
-            onClick={() => { signOut(); navigate({ to: "/auth" }); }}
+            onClick={async () => { await supabase.auth.signOut(); clearLocalUser(); navigate({ to: "/auth" }); }}
             className="w-10 h-10 rounded-xl bg-white/15 grid place-items-center"
             aria-label="Sign out"
           >
