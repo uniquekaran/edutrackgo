@@ -2,7 +2,8 @@ import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Users, ShieldCheck, Megaphone, LogOut, GraduationCap, CheckCircle2, XCircle, Send } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
-import { store, useStore, signOut, attendanceStats, setDocStatus, broadcast, CATEGORY_LABELS } from "@/lib/store";
+import { store, useStore, signOut as clearLocalUser, attendanceStats, setDocStatus, broadcast, CATEGORY_LABELS } from "@/lib/store";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { StatusTag } from "./student.documents";
 
@@ -35,7 +36,7 @@ function AdminConsole() {
             <h1 className="text-2xl font-black mt-0.5">Hello, {user.name.split(" ")[0]}</h1>
           </div>
           <button
-            onClick={() => { signOut(); navigate({ to: "/auth" }); }}
+            onClick={async () => { await supabase.auth.signOut(); clearLocalUser(); navigate({ to: "/auth" }); }}
             className="w-10 h-10 rounded-xl bg-white/15 grid place-items-center"
             aria-label="Sign out"
           >

@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowLeft, GraduationCap, Mail, Lock, User as UserIcon, ShieldCheck } from "lucide-react";
-import { signIn, type Role } from "@/lib/store";
+import { useEffect, useState } from "react";
+import { ArrowLeft, GraduationCap, Loader2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { MobileShell } from "@/components/MobileShell";
+import { lovable } from "@/integrations/lovable";
+import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — EduTrack" }] }),
@@ -12,30 +13,36 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"login" | "signup">("login");
-  const [role, setRole] = useState<Role>("student");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const user = useStore((s) => s.user);
+  const [loading, setLoading] = useState(false);
 
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email || !password) {
-      toast.error("Email and password are required");
-      return;
+  // If a session is already active, leave the auth screen.
+  useEffect(() => {
+    if (user) navigate({ to: user.role === "admin" ? "/admin" : "/student" });
+  }, [user, navigate]);
+
+  async function handleGoogle() {
+    setLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error(result.error.message ?? "Sign-in failed. Please try again.");
+        setLoading(false);
+        return;
+      }
+      if (result.redirected) return; // browser will navigate
+      // Tokens set; auth listener will route us. Keep spinner visible briefly.
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Sign-in failed.");
+      setLoading(false);
     }
-    if (mode === "signup" && !name) {
-      toast.error("Please enter your name");
-      return;
-    }
-    const u = signIn({ name, email, password, role, isSignup: mode === "signup" });
-    toast.success(`Welcome${mode === "signup" ? "" : " back"}, ${u.name.split(" ")[0]}!`);
-    navigate({ to: u.role === "admin" ? "/admin" : "/student" });
   }
 
   return (
     <MobileShell>
-      <div className="px-6 pt-10 pb-6 gradient-primary text-primary-foreground">
+      <div className="px-6 pt-10 pb-8 gradient-primary text-primary-foreground">
         <Link to="/" className="inline-flex items-center gap-1.5 text-sm opacity-90">
           <ArrowLeft className="w-4 h-4" /> Back
         </Link>
@@ -45,78 +52,46 @@ function AuthPage() {
           </div>
           <h1 className="text-2xl font-black">EduTrack</h1>
         </div>
-        <h2 className="mt-6 text-3xl font-black">
-          {mode === "login" ? "Welcome back" : "Create your account"}
+        <h2 className="mt-8 text-3xl font-black leading-tight">
+          Sign in to your campus
         </h2>
-        <p className="mt-1 text-sm opacity-90">
-          {mode === "login" ? "Sign in to continue to your dashboard." : "Join your campus in under a minute."}
+        <p className="mt-2 text-sm opacity-90">
+          One tap with Google. We'll take it from there.
         </p>
       </div>
 
       <div className="flex-1 px-6 -mt-6">
-        <div className="rounded-3xl bg-surface shadow-soft p-5">
-          <div className="grid grid-cols-2 bg-secondary rounded-xl p-1 mb-5">
-            {(["login", "signup"] as const).map((m) => (
-              <button
-                key={m}
-                onClick={() => setMode(m)}
-                className={`h-10 rounded-lg text-sm font-bold transition-all ${
-                  mode === m ? "bg-surface shadow-soft text-foreground" : "text-muted-foreground"
-                }`}
-              >
-                {m === "login" ? "Sign In" : "Sign Up"}
-              </button>
-            ))}
+        <div className="rounded-3xl bg-surface shadow-soft p-6">
+          <button
+            onClick={handleGoogle}
+            disabled={loading}
+            className="w-full h-14 rounded-2xl bg-white border border-border shadow-soft flex items-center justify-center gap-3 font-semibold text-foreground active:scale-[0.98] transition-transform disabled:opacity-70"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Connecting…
+              </>
+            ) : (
+              <>
+                <GoogleIcon className="w-5 h-5" />
+                Continue with Google
+              </>
+            )}
+          </button>
+
+          <div className="mt-5 flex items-start gap-3 p-3.5 rounded-2xl bg-accent/40 border border-border">
+            <ShieldCheck className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+            <div>
+              <p className="text-xs font-bold text-foreground">Secure & private</p>
+              <p className="text-[11px] text-muted-foreground leading-relaxed mt-0.5">
+                We only access your name, email, and avatar. New accounts join as students by default — administrative access is granted by your campus only.
+              </p>
+            </div>
           </div>
 
-          <form onSubmit={submit} className="space-y-3">
-            {mode === "signup" && (
-              <Field icon={<UserIcon className="w-4 h-4" />} label="Full Name">
-                <input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Aria Mehta"
-                  className="w-full bg-transparent outline-none text-sm font-medium"
-                />
-              </Field>
-            )}
-            <Field icon={<Mail className="w-4 h-4" />} label="Email">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@college.edu"
-                className="w-full bg-transparent outline-none text-sm font-medium"
-              />
-            </Field>
-            <Field icon={<Lock className="w-4 h-4" />} label="Password">
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-transparent outline-none text-sm font-medium"
-              />
-            </Field>
-
-            <div>
-              <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Role</label>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                <RoleCard active={role === "student"} onClick={() => setRole("student")} icon={<GraduationCap className="w-5 h-5" />} label="Student" />
-                <RoleCard active={role === "admin"} onClick={() => setRole("admin")} icon={<ShieldCheck className="w-5 h-5" />} label="Administrator" />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="mt-4 w-full h-14 py-3.5 rounded-2xl gradient-primary text-primary-foreground font-bold shadow-elevated active:scale-[0.98] transition-transform"
-            >
-              {mode === "login" ? "Sign In" : "Create Account"}
-            </button>
-          </form>
-
-          <p className="mt-4 text-center text-xs text-muted-foreground">
-            Try <span className="font-semibold text-foreground">aria@college.edu</span> (student) or <span className="font-semibold text-foreground">dean@college.edu</span> (admin)
+          <p className="mt-5 text-center text-[11px] text-muted-foreground">
+            By continuing you agree to EduTrack's Terms & Privacy.
           </p>
         </div>
       </div>
@@ -124,29 +99,13 @@ function AuthPage() {
   );
 }
 
-function Field({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
+function GoogleIcon({ className }: { className?: string }) {
   return (
-    <label className="block">
-      <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
-      <div className="mt-1.5 flex items-center gap-2.5 px-3.5 h-12 rounded-xl bg-secondary border border-transparent focus-within:border-primary focus-within:bg-surface transition-all">
-        <span className="text-muted-foreground">{icon}</span>
-        {children}
-      </div>
-    </label>
-  );
-}
-
-function RoleCard({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`h-20 rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition-all ${
-        active ? "border-primary bg-accent text-primary" : "border-border bg-surface text-muted-foreground"
-      }`}
-    >
-      {icon}
-      <span className="text-xs font-bold">{label}</span>
-    </button>
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <path fill="#4285F4" d="M21.6 12.227c0-.709-.064-1.39-.182-2.045H12v3.868h5.382a4.6 4.6 0 0 1-1.996 3.018v2.51h3.232c1.89-1.74 2.982-4.305 2.982-7.351Z" />
+      <path fill="#34A853" d="M12 22c2.7 0 4.964-.895 6.618-2.422l-3.232-2.51c-.895.6-2.04.955-3.386.955-2.605 0-4.81-1.76-5.598-4.122H3.064v2.59A9.996 9.996 0 0 0 12 22Z" />
+      <path fill="#FBBC05" d="M6.402 13.9a6.01 6.01 0 0 1 0-3.8V7.51H3.064a10.01 10.01 0 0 0 0 8.98l3.338-2.59Z" />
+      <path fill="#EA4335" d="M12 5.977c1.468 0 2.786.505 3.823 1.496l2.868-2.868C16.96 2.99 14.695 2 12 2A9.996 9.996 0 0 0 3.064 7.51l3.338 2.59C7.19 7.737 9.395 5.977 12 5.977Z" />
+    </svg>
   );
 }

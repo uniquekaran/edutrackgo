@@ -125,27 +125,20 @@ export function useStore<T>(selector: (s: AppState) => T): T {
 }
 
 // Actions
-export function signIn(input: { name: string; email: string; password: string; role: Role; isSignup: boolean }): User {
-  const existing = state.users.find((u) => u.email.toLowerCase() === input.email.toLowerCase());
-  let user: User;
-  if (existing) {
-    user = existing;
-  } else {
-    user = {
-      id: "u" + Math.random().toString(36).slice(2, 8),
-      name: input.name || input.email.split("@")[0],
-      email: input.email,
-      role: input.role,
-      department: input.role === "student" ? DEPARTMENTS[Math.floor(Math.random() * DEPARTMENTS.length)] : undefined,
-    };
-    store.set((s) => ({ ...s, users: [...s.users, user] }));
-  }
-  store.set((s) => ({ ...s, user }));
-  return user;
+export function setCurrentUser(user: User) {
+  store.set((s) => {
+    const existing = s.users.find((u) => u.id === user.id);
+    const users = existing ? s.users.map((u) => (u.id === user.id ? user : u)) : [...s.users, user];
+    return { ...s, user, users };
+  });
 }
 
 export function signOut() {
   store.set((s) => ({ ...s, user: null }));
+}
+
+export function randomDepartment() {
+  return DEPARTMENTS[Math.floor(Math.random() * DEPARTMENTS.length)];
 }
 
 export function markAttendance(userId: string) {
