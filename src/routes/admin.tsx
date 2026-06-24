@@ -1,11 +1,21 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { Users, ShieldCheck, Megaphone, LogOut, GraduationCap, CheckCircle2, XCircle, Send } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Users, ShieldCheck, Megaphone, LogOut, GraduationCap, CheckCircle2, XCircle, Send, ExternalLink, FileText } from "lucide-react";
 import { MobileShell } from "@/components/MobileShell";
-import { store, useStore, signOut as clearLocalUser, attendanceStats, setDocStatus, broadcast, CATEGORY_LABELS } from "@/lib/store";
+import { store, useStore, signOut as clearLocalUser, attendanceStats, broadcast } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { StatusTag } from "./student.documents";
+import { StatusTag, type DocStatus } from "./student.documents";
+
+interface AdminDocRow {
+  id: string;
+  student_id: string;
+  student_name: string;
+  document_type: string;
+  file_url: string;
+  status: DocStatus;
+  created_at: string;
+}
 
 export const Route = createFileRoute("/admin")({
   beforeLoad: () => {
