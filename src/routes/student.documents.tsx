@@ -41,7 +41,9 @@ function Documents() {
   const [uploading, setUploading] = useState(false);
   const [docs, setDocs] = useState<DocRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [preview, setPreview] = useState<DocRow | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const prevStatusRef = useRef<Map<string, DocStatus>>(new Map());
 
   // Initial load + realtime subscription
   useEffect(() => {
