@@ -1,8 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Calendar, CheckCircle2, TrendingUp, Sparkles } from "lucide-react";
-import { attendanceStats, markAttendance, useStore } from "@/lib/store";
+import { Calendar, CheckCircle2, TrendingUp, Sparkles, LogOut } from "lucide-react";
+import { attendanceStats, markAttendance, signOut as clearLocalUser, useStore } from "@/lib/store";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { formatISTDay } from "@/lib/format";
 
 export const Route = createFileRoute("/student/")({
   head: () => ({ meta: [{ title: "Dashboard — EduTrack" }] }),
