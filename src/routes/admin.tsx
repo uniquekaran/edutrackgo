@@ -418,15 +418,13 @@ function DocumentsHub({ docs, onPreview }: { docs: DocRow[]; onPreview: (d: DocR
                   </p>
                 </div>
                 {d.file_url && (
-                  <a
-                    href={d.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => onPreview(d)}
                     className="w-8 h-8 rounded-lg grid place-items-center text-muted-foreground hover:bg-accent/50"
-                    aria-label="Open file"
+                    aria-label="Preview file"
                   >
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
+                    <FileText className="w-4 h-4" />
+                  </button>
                 )}
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">
