@@ -68,6 +68,7 @@ function seed(): AppState {
   return {
     user: null,
     users: seedUsers,
+    attendance,
     documents: [
       { id: "d1", ownerId: "u1", ownerName: "Aria Mehta", category: "academic", fileName: "transcript_s5.pdf", status: "pending", uploadedAt: Date.now() - 86400000 },
       { id: "d2", ownerId: "u2", ownerName: "Rohan Verma", category: "identity", fileName: "aadhaar.pdf", status: "pending", uploadedAt: Date.now() - 3600000 },
