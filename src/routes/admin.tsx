@@ -577,7 +577,7 @@ function Analytics({
             {announcements.map((a) => (
               <div key={a.id} className="rounded-2xl bg-surface shadow-soft p-4">
                 <p className="text-sm font-bold">{a.title}</p>
-                <p className="text-[11px] text-muted-foreground">{new Date(a.createdAt).toLocaleString()}</p>
+                <p className="text-[11px] text-muted-foreground">{formatISTDateTime(a.createdAt)}</p>
                 <p className="mt-2 text-sm">{a.body}</p>
               </div>
             ))}
