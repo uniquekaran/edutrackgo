@@ -33,7 +33,8 @@ const DOC_TYPES = [
 const BUCKET = "student-documents";
 
 function Documents() {
-  const user = useStore((s) => s.user)!;
+  const user = useStore((s) => s.user);
+  if (!user) return null;
   const [docType, setDocType] = useState<string>(DOC_TYPES[0]);
   const [uploading, setUploading] = useState(false);
   const [docs, setDocs] = useState<DocRow[]>([]);
