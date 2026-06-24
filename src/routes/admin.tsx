@@ -419,7 +419,7 @@ function DocumentsHub({ docs, onPreview }: { docs: DocRow[]; onPreview: (d: DocR
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold truncate">{d.student_name}</p>
                   <p className="text-[11px] text-muted-foreground truncate">
-                    {d.document_type} · {new Date(d.created_at).toLocaleDateString()}
+                    {d.document_type} · {formatISTDate(d.created_at)}
                   </p>
                 </div>
                 {d.file_url && (
