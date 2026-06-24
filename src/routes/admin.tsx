@@ -104,8 +104,8 @@ function AdminConsole() {
   }, [isAuthorized]);
 
   // --- Loading / gating UI ---
-  if (isAuthorized === null) return <FullScreenSpinner label="Verifying admin access…" />;
-  if (isAuthorized === false) return <FullScreenSpinner label="Redirecting…" />;
+  if (isAuthorized === null) return <FullScreenSpinner label="Loading dashboard…" />;
+  if (isAuthorized === false) return <FullScreenSpinner label="Loading dashboard…" />;
   if (bootError) {
     return (
       <MobileShell>
