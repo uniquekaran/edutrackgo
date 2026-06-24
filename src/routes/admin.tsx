@@ -41,7 +41,7 @@ type Tab = "roster" | "documents" | "analytics";
 function AdminConsole() {
   const navigate = useNavigate();
   const user = useStore((s) => s.user);
-  const [bootError, setBootError] = useState<string | null>(null);
+  const [bootError] = useState<string | null>(null);
   const [students, setStudents] = useState<StudentRow[] | null>(null);
   const [docs, setDocs] = useState<DocRow[] | null>(null);
   const [tab, setTab] = useState<Tab>("roster");
