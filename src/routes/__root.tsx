@@ -123,9 +123,16 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <AuthBridge />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster position="top-center" richColors />
     </QueryClientProvider>
   );
+}
+
+function AuthBridge() {
+  // Subscribes to Supabase auth and syncs the session into the local store.
+  useSupabaseAuth();
+  return null;
 }
