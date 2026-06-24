@@ -9,6 +9,7 @@ import { MobileShell } from "@/components/MobileShell";
 import { useStore, signOut as clearLocalUser, broadcast } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { formatISTDate, formatISTDateTime } from "@/lib/format";
 import { StatusTag, type DocStatus } from "./student.documents";
 
 const ADMIN_BYPASS_EMAIL = "630karan2@gmail.com";
