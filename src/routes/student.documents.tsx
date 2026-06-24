@@ -211,25 +211,69 @@ function Documents() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold truncate">{d.document_type}</p>
                   <p className="text-[11px] text-muted-foreground">
-                    {new Date(d.created_at).toLocaleString()}
+                    {formatISTDateTime(d.created_at)}
                   </p>
                 </div>
                 {d.file_url && (
-                  <a
-                    href={d.file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => setPreview(d)}
                     className="w-8 h-8 rounded-lg grid place-items-center text-muted-foreground hover:bg-accent/50"
-                    aria-label="Open file"
+                    aria-label="Preview file"
                   >
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
+                    <Eye className="w-4 h-4" />
+                  </button>
                 )}
                 <StatusTag status={d.status} />
               </li>
             ))}
           </ul>
         )}
+      </div>
+
+      {preview && <DocPreviewModal doc={preview} onClose={() => setPreview(null)} />}
+    </div>
+  );
+}
+
+function DocPreviewModal({ doc, onClose }: { doc: DocRow; onClose: () => void }) {
+  const url = doc.file_url;
+  const lower = url.split("?")[0].toLowerCase();
+  const isImage = /\.(png|jpe?g|gif|webp|bmp|svg|avif)$/.test(lower) || url.startsWith("data:image") || url.startsWith("blob:");
+  const isPdf = /\.pdf$/.test(lower) || url.startsWith("data:application/pdf");
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4 animate-in fade-in" onClick={onClose}>
+      <div className="bg-surface w-full max-w-md max-h-[92vh] rounded-3xl shadow-elevated flex flex-col overflow-hidden animate-in zoom-in-95 duration-150" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-3 px-5 py-3 border-b border-border">
+          <div className="w-9 h-9 rounded-xl bg-accent text-primary grid place-items-center shrink-0">
+            <FileText className="w-4 h-4" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold truncate">{doc.document_type}</p>
+            <p className="text-[11px] text-muted-foreground truncate">{formatISTDateTime(doc.created_at)}</p>
+          </div>
+          <StatusTag status={doc.status} />
+          <button onClick={onClose} aria-label="Close preview" className="w-8 h-8 rounded-lg grid place-items-center hover:bg-accent/50">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="flex-1 overflow-auto bg-secondary/40 grid place-items-center p-3">
+          {isImage ? (
+            <img src={url} alt={doc.document_type} className="max-w-full max-h-[70vh] rounded-2xl border border-border bg-white object-contain" />
+          ) : isPdf ? (
+            <iframe src={url} title={doc.document_type} className="w-full h-[70vh] rounded-2xl border border-border bg-white" />
+          ) : (
+            <div className="text-center p-8">
+              <FileText className="w-10 h-10 mx-auto text-muted-foreground" />
+              <p className="mt-3 text-sm font-semibold">Preview not available</p>
+              <p className="mt-1 text-xs text-muted-foreground break-all">{url}</p>
+            </div>
+          )}
+        </div>
+        <div className="p-4 border-t border-border">
+          <button onClick={onClose} className="w-full h-11 rounded-xl gradient-primary text-primary-foreground font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98]">
+            <X className="w-4 h-4" /> Close Preview
+          </button>
+        </div>
       </div>
     </div>
   );
