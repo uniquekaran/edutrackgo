@@ -168,7 +168,7 @@ function AdminConsole() {
 
       <div className="flex-1 overflow-y-auto pb-8 animate-in fade-in duration-200" key={tab}>
         {tab === "roster" && <Roster students={students} docs={docs} onOpen={setSelectedStudent} />}
-        {tab === "documents" && <DocumentsHub docs={docs} />}
+        {tab === "documents" && <DocumentsHub docs={docs} onPreview={setPreview} />}
         {tab === "analytics" && <Analytics students={students} docs={docs} authorName={user.name ?? "Admin"} />}
       </div>
 
@@ -177,8 +177,11 @@ function AdminConsole() {
           student={selectedStudent}
           docs={docs.filter((d) => d.student_id === selectedStudent.id)}
           onClose={() => setSelectedStudent(null)}
+          onPreview={setPreview}
         />
       )}
+
+      {preview && <DocPreviewModal doc={preview} onClose={() => setPreview(null)} />}
     </MobileShell>
   );
 }
