@@ -1,7 +1,7 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { LayoutDashboard, FileText, Megaphone, LogOut } from "lucide-react";
-import { signOut } from "@/lib/store";
-import { useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
+import { signOut as clearLocalUser } from "@/lib/store";
 
 export function BottomNav() {
   const navigate = useNavigate();
