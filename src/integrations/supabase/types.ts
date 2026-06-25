@@ -47,6 +47,45 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_materials: {
+        Row: {
+          course: string | null
+          created_at: string
+          description: string | null
+          file_url: string
+          id: string
+          module: string | null
+          subject: string
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          course?: string | null
+          created_at?: string
+          description?: string | null
+          file_url: string
+          id?: string
+          module?: string | null
+          subject: string
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          course?: string | null
+          created_at?: string
+          description?: string | null
+          file_url?: string
+          id?: string
+          module?: string | null
+          subject?: string
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -74,6 +113,84 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      student_profiles_detail: {
+        Row: {
+          avatar_url: string | null
+          blood_group: string | null
+          college_name: string | null
+          course: string | null
+          created_at: string
+          father_name: string | null
+          full_name: string | null
+          id: string
+          mother_name: string | null
+          roll_number: string | null
+          semester: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          blood_group?: string | null
+          college_name?: string | null
+          course?: string | null
+          created_at?: string
+          father_name?: string | null
+          full_name?: string | null
+          id?: string
+          mother_name?: string | null
+          roll_number?: string | null
+          semester?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          blood_group?: string | null
+          college_name?: string | null
+          course?: string | null
+          created_at?: string
+          father_name?: string | null
+          full_name?: string | null
+          id?: string
+          mother_name?: string | null
+          roll_number?: string | null
+          semester?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      todo_list: {
+        Row: {
+          created_at: string
+          done: boolean
+          due_date: string | null
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          done?: boolean
+          due_date?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          done?: boolean
+          due_date?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

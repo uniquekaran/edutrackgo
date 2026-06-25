@@ -14,6 +14,8 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StudentIndexRouteImport } from './routes/student.index'
+import { Route as StudentProfileRouteImport } from './routes/student.profile'
+import { Route as StudentMaterialsRouteImport } from './routes/student.materials'
 import { Route as StudentDocumentsRouteImport } from './routes/student.documents'
 import { Route as StudentAnnouncementsRouteImport } from './routes/student.announcements'
 
@@ -42,6 +44,16 @@ const StudentIndexRoute = StudentIndexRouteImport.update({
   path: '/',
   getParentRoute: () => StudentRoute,
 } as any)
+const StudentProfileRoute = StudentProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentMaterialsRoute = StudentMaterialsRouteImport.update({
+  id: '/materials',
+  path: '/materials',
+  getParentRoute: () => StudentRoute,
+} as any)
 const StudentDocumentsRoute = StudentDocumentsRouteImport.update({
   id: '/documents',
   path: '/documents',
@@ -60,6 +72,8 @@ export interface FileRoutesByFullPath {
   '/student': typeof StudentRouteWithChildren
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
+  '/student/materials': typeof StudentMaterialsRoute
+  '/student/profile': typeof StudentProfileRoute
   '/student/': typeof StudentIndexRoute
 }
 export interface FileRoutesByTo {
@@ -68,6 +82,8 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
+  '/student/materials': typeof StudentMaterialsRoute
+  '/student/profile': typeof StudentProfileRoute
   '/student': typeof StudentIndexRoute
 }
 export interface FileRoutesById {
@@ -78,6 +94,8 @@ export interface FileRoutesById {
   '/student': typeof StudentRouteWithChildren
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
+  '/student/materials': typeof StudentMaterialsRoute
+  '/student/profile': typeof StudentProfileRoute
   '/student/': typeof StudentIndexRoute
 }
 export interface FileRouteTypes {
@@ -89,6 +107,8 @@ export interface FileRouteTypes {
     | '/student'
     | '/student/announcements'
     | '/student/documents'
+    | '/student/materials'
+    | '/student/profile'
     | '/student/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -97,6 +117,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/student/announcements'
     | '/student/documents'
+    | '/student/materials'
+    | '/student/profile'
     | '/student'
   id:
     | '__root__'
@@ -106,6 +128,8 @@ export interface FileRouteTypes {
     | '/student'
     | '/student/announcements'
     | '/student/documents'
+    | '/student/materials'
+    | '/student/profile'
     | '/student/'
   fileRoutesById: FileRoutesById
 }
@@ -153,6 +177,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentIndexRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/student/profile': {
+      id: '/student/profile'
+      path: '/profile'
+      fullPath: '/student/profile'
+      preLoaderRoute: typeof StudentProfileRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/materials': {
+      id: '/student/materials'
+      path: '/materials'
+      fullPath: '/student/materials'
+      preLoaderRoute: typeof StudentMaterialsRouteImport
+      parentRoute: typeof StudentRoute
+    }
     '/student/documents': {
       id: '/student/documents'
       path: '/documents'
@@ -173,12 +211,16 @@ declare module '@tanstack/react-router' {
 interface StudentRouteChildren {
   StudentAnnouncementsRoute: typeof StudentAnnouncementsRoute
   StudentDocumentsRoute: typeof StudentDocumentsRoute
+  StudentMaterialsRoute: typeof StudentMaterialsRoute
+  StudentProfileRoute: typeof StudentProfileRoute
   StudentIndexRoute: typeof StudentIndexRoute
 }
 
 const StudentRouteChildren: StudentRouteChildren = {
   StudentAnnouncementsRoute: StudentAnnouncementsRoute,
   StudentDocumentsRoute: StudentDocumentsRoute,
+  StudentMaterialsRoute: StudentMaterialsRoute,
+  StudentProfileRoute: StudentProfileRoute,
   StudentIndexRoute: StudentIndexRoute,
 }
 

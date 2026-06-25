@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Users, ShieldCheck, Megaphone, LogOut, CheckCircle2, XCircle, Send,
   FileText, Search, ChevronRight, X, Loader2, BarChart3,
-  CalendarCheck, AlertTriangle,
+  CalendarCheck, AlertTriangle, BookOpen, Upload, Trash2,
 } from "lucide-react";
+
 import { MobileShell } from "@/components/MobileShell";
 import { useStore, signOut as clearLocalUser, broadcast } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
@@ -298,9 +299,47 @@ function Roster({
 
 /* =================== Student Profile + Docs side-panel =================== */
 
+interface StudentDetail {
+  full_name: string | null;
+  course: string | null;
+  semester: string | null;
+  roll_number: string | null;
+  father_name: string | null;
+  mother_name: string | null;
+  college_name: string | null;
+  blood_group: string | null;
+  avatar_url: string | null;
+}
+
 function StudentProfilePanel({
   student, docs, onClose, onPreview,
 }: { student: StudentRow; docs: DocRow[]; onClose: () => void; onPreview: (d: DocRow) => void }) {
+  const [bio, setBio] = useState<StudentDetail | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("student_profiles_detail")
+          .select("full_name, course, semester, roll_number, father_name, mother_name, college_name, blood_group, avatar_url")
+          .eq("user_id", student.id)
+          .maybeSingle();
+        if (!active) return;
+        setBio(data as StudentDetail | null);
+        const path = data?.avatar_url;
+        if (path && !path.startsWith("http") && !path.startsWith("blob:") && !path.startsWith("data:")) {
+          const { data: signed } = await supabase.storage.from("student-avatars").createSignedUrl(path, 60 * 60 * 24);
+          if (active && signed?.signedUrl) setAvatarUrl(signed.signedUrl);
+        } else if (path) {
+          setAvatarUrl(path);
+        }
+      } catch (e) { console.warn(e); }
+    })();
+    return () => { active = false; };
+  }, [student.id]);
+
   async function setStatus(id: string, status: DocStatus) {
     const { error } = await supabase.from("documents").update({ status }).eq("id", id);
     if (error) { toast.error(error.message); return; }
@@ -314,11 +353,15 @@ function StudentProfilePanel({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-5 border-b border-border flex items-start gap-3">
-          <div className="w-12 h-12 rounded-2xl gradient-primary text-primary-foreground grid place-items-center font-black shrink-0">
-            {(student.full_name ?? "?").split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()}
+          <div className="w-14 h-14 rounded-2xl gradient-primary text-primary-foreground grid place-items-center font-black shrink-0 overflow-hidden">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+            ) : (
+              (bio?.full_name ?? student.full_name ?? "?").split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()
+            )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-base font-bold truncate">{student.full_name ?? "Unnamed student"}</p>
+            <p className="text-base font-bold truncate">{bio?.full_name ?? student.full_name ?? "Unnamed student"}</p>
             <p className="text-xs text-muted-foreground truncate">{student.email}</p>
             <p className="text-[10px] text-muted-foreground/80 truncate mt-0.5 font-mono">UID: {student.id}</p>
             {student.department && (
@@ -330,8 +373,22 @@ function StudentProfilePanel({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 space-y-3">
+
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          <section>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Bio-data</h3>
+            <div className="rounded-2xl bg-secondary/40 p-4 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+              <BioRow k="Course" v={bio?.course} />
+              <BioRow k="Semester" v={bio?.semester} />
+              <BioRow k="Roll No." v={bio?.roll_number} />
+              <BioRow k="Blood" v={bio?.blood_group} />
+              <BioRow k="Father" v={bio?.father_name} full />
+              <BioRow k="Mother" v={bio?.mother_name} full />
+              <BioRow k="College" v={bio?.college_name} full />
+            </div>
+          </section>
           <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">All documents</h3>
+
           {docs.length === 0 && (
             <div className="rounded-xl bg-secondary/50 p-6 text-center text-sm text-muted-foreground">
               No documents uploaded yet.
@@ -384,6 +441,16 @@ function StudentProfilePanel({
     </div>
   );
 }
+
+function BioRow({ k, v, full }: { k: string; v?: string | null; full?: boolean }) {
+  return (
+    <div className={full ? "col-span-2" : ""}>
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{k}</p>
+      <p className="text-xs font-bold truncate">{v || "—"}</p>
+    </div>
+  );
+}
+
 
 /* ========================== Tab 2: Documents Hub ========================== */
 
@@ -568,6 +635,9 @@ function Analytics({
         </div>
       </div>
 
+      <LearningMaterialUploader />
+
+
       {announcements.length > 0 && (
         <section>
           <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-2">
@@ -599,6 +669,189 @@ function MetricCard({ label, value, icon }: { label: string; value: number; icon
     </div>
   );
 }
+
+/* ====================== Learning Material Uploader ====================== */
+
+interface MaterialRow {
+  id: string;
+  title: string;
+  subject: string;
+  module: string | null;
+  course: string | null;
+  file_url: string;
+  created_at: string;
+}
+
+function LearningMaterialUploader() {
+  const [items, setItems] = useState<MaterialRow[]>([]);
+  const [title, setTitle] = useState("");
+  const [subject, setSubject] = useState("");
+  const [moduleName, setModuleName] = useState("");
+  const [course, setCourse] = useState("");
+  const [fileUrl, setFileUrl] = useState("");
+  const [description, setDescription] = useState("");
+  const [busy, setBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let active = true;
+    async function load() {
+      const { data } = await supabase
+        .from("learning_materials")
+        .select("id, title, subject, module, course, file_url, created_at")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (active) setItems((data ?? []) as MaterialRow[]);
+    }
+    load();
+    const ch = supabase
+      .channel("admin:materials")
+      .on("postgres_changes", { event: "*", schema: "public", table: "learning_materials" }, () => load())
+      .subscribe();
+    return () => { active = false; supabase.removeChannel(ch); };
+  }, []);
+
+  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setBusy(true);
+    try {
+      const ext = file.name.split(".").pop() || "bin";
+      const path = `materials/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error } = await supabase.storage.from("student-documents").upload(path, file, {
+        contentType: file.type, upsert: false,
+      });
+      if (error) throw error;
+      const { data: signed } = await supabase.storage.from("student-documents").createSignedUrl(path, 60 * 60 * 24 * 365);
+      setFileUrl(signed?.signedUrl ?? path);
+      if (!title) setTitle(file.name.replace(/\.[^.]+$/, ""));
+      toast.success("File uploaded");
+    } catch (err) {
+      console.warn(err);
+      toast.error("File upload failed — paste a link instead");
+    } finally { setBusy(false); }
+  }
+
+  async function publish() {
+    if (!title.trim() || !subject.trim() || !fileUrl.trim()) {
+      toast.error("Title, subject and file/link are required");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.from("learning_materials").insert({
+      title: title.trim(),
+      subject: subject.trim(),
+      module: moduleName.trim() || null,
+      course: course.trim() || null,
+      description: description.trim() || null,
+      file_url: fileUrl.trim(),
+    });
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    setTitle(""); setSubject(""); setModuleName(""); setCourse(""); setFileUrl(""); setDescription("");
+    toast.success("Published to student feed");
+  }
+
+  async function remove(id: string) {
+    await supabase.from("learning_materials").delete().eq("id", id);
+  }
+
+  return (
+    <div className="rounded-2xl bg-surface shadow-soft p-4">
+      <h2 className="text-base font-bold flex items-center gap-2">
+        <BookOpen className="w-4 h-4 text-primary" /> Upload Learning Material
+      </h2>
+      <p className="text-xs text-muted-foreground">PPTs or notes published instantly to students.</p>
+
+      <div className="mt-4 space-y-3">
+        <MiniField label="Title" v={title} onChange={setTitle} placeholder="Unit 3 — Data Structures" />
+        <div className="grid grid-cols-2 gap-3">
+          <MiniField label="Subject" v={subject} onChange={setSubject} placeholder="DSA" />
+          <MiniField label="Module" v={moduleName} onChange={setModuleName} placeholder="Module 3" />
+        </div>
+        <MiniField label="Course (optional)" v={course} onChange={setCourse} placeholder="B.Tech" />
+        <div>
+          <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Description</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={2}
+            placeholder="Short description (optional)"
+            className="mt-1.5 w-full px-3 py-2 rounded-xl bg-secondary outline-none text-sm font-medium border border-transparent focus:border-primary focus:bg-surface transition-all resize-none"
+          />
+        </div>
+        <div>
+          <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">File or Link</label>
+          <div className="mt-1.5 flex items-center gap-2">
+            <input
+              value={fileUrl}
+              onChange={(e) => setFileUrl(e.target.value)}
+              placeholder="https://… or upload file"
+              className="flex-1 h-11 px-3 rounded-xl bg-secondary outline-none text-sm font-medium border border-transparent focus:border-primary focus:bg-surface transition-all"
+            />
+            <input ref={fileRef} type="file" className="hidden" onChange={onFile} accept=".ppt,.pptx,.pdf,.doc,.docx,image/*" />
+            <button
+              onClick={() => fileRef.current?.click()}
+              disabled={busy}
+              className="h-11 px-3 rounded-xl bg-secondary border border-border font-bold text-xs flex items-center gap-1.5"
+            >
+              <Upload className="w-3.5 h-3.5" /> File
+            </button>
+          </div>
+        </div>
+        <button
+          onClick={publish}
+          disabled={busy}
+          className="w-full h-12 rounded-2xl gradient-primary text-primary-foreground font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-70"
+        >
+          {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Working…</> : <><Send className="w-4 h-4" /> Publish to Students</>}
+        </button>
+      </div>
+
+      {items.length > 0 && (
+        <div className="mt-5">
+          <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Recent uploads</h3>
+          <ul className="divide-y divide-border">
+            {items.map((m) => (
+              <li key={m.id} className="py-2.5 flex items-center gap-3">
+                <FileText className="w-4 h-4 text-primary shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold truncate">{m.title}</p>
+                  <p className="text-[10px] text-muted-foreground truncate">
+                    {m.subject}{m.module ? ` · ${m.module}` : ""} · {formatISTDate(m.created_at)}
+                  </p>
+                </div>
+                <button
+                  onClick={() => remove(m.id)}
+                  className="w-8 h-8 rounded-lg grid place-items-center text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  aria-label="Delete"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MiniField({ label, v, onChange, placeholder }: { label: string; v: string; onChange: (v: string) => void; placeholder?: string }) {
+  return (
+    <div>
+      <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{label}</label>
+      <input
+        value={v}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="mt-1.5 w-full h-11 px-3 rounded-xl bg-secondary outline-none text-sm font-semibold border border-transparent focus:border-primary focus:bg-surface transition-all"
+      />
+    </div>
+  );
+}
+
 
 /* ============================ Doc Preview Modal ============================ */
 
