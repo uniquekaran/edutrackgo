@@ -635,6 +635,9 @@ function Analytics({
         </div>
       </div>
 
+      <LearningMaterialUploader />
+
+
       {announcements.length > 0 && (
         <section>
           <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-2">
