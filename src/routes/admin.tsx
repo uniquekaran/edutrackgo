@@ -374,8 +374,21 @@ function StudentProfilePanel({
         </div>
 
 
-        <div className="flex-1 overflow-y-auto p-5 space-y-3">
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+          <section>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Bio-data</h3>
+            <div className="rounded-2xl bg-secondary/40 p-4 grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+              <BioRow k="Course" v={bio?.course} />
+              <BioRow k="Semester" v={bio?.semester} />
+              <BioRow k="Roll No." v={bio?.roll_number} />
+              <BioRow k="Blood" v={bio?.blood_group} />
+              <BioRow k="Father" v={bio?.father_name} full />
+              <BioRow k="Mother" v={bio?.mother_name} full />
+              <BioRow k="College" v={bio?.college_name} full />
+            </div>
+          </section>
           <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">All documents</h3>
+
           {docs.length === 0 && (
             <div className="rounded-xl bg-secondary/50 p-6 text-center text-sm text-muted-foreground">
               No documents uploaded yet.
