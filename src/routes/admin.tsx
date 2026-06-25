@@ -442,6 +442,16 @@ function StudentProfilePanel({
   );
 }
 
+function BioRow({ k, v, full }: { k: string; v?: string | null; full?: boolean }) {
+  return (
+    <div className={full ? "col-span-2" : ""}>
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{k}</p>
+      <p className="text-xs font-bold truncate">{v || "—"}</p>
+    </div>
+  );
+}
+
+
 /* ========================== Tab 2: Documents Hub ========================== */
 
 function DocumentsHub({ docs, onPreview }: { docs: DocRow[]; onPreview: (d: DocRow) => void }) {
