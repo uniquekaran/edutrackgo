@@ -94,6 +94,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "EduTrack — College Management" },
+      { name: "twitter:description", content: "Track attendance, manage documents, and stay informed with EduTrack." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/152e6b6b-d80f-46ff-a602-5c5a08cd7aab" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/152e6b6b-d80f-46ff-a602-5c5a08cd7aab" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
