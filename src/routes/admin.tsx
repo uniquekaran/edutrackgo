@@ -670,6 +670,189 @@ function MetricCard({ label, value, icon }: { label: string; value: number; icon
   );
 }
 
+/* ====================== Learning Material Uploader ====================== */
+
+interface MaterialRow {
+  id: string;
+  title: string;
+  subject: string;
+  module: string | null;
+  course: string | null;
+  file_url: string;
+  created_at: string;
+}
+
+function LearningMaterialUploader() {
+  const [items, setItems] = useState<MaterialRow[]>([]);
+  const [title, setTitle] = useState("");
+  const [subject, setSubject] = useState("");
+  const [moduleName, setModuleName] = useState("");
+  const [course, setCourse] = useState("");
+  const [fileUrl, setFileUrl] = useState("");
+  const [description, setDescription] = useState("");
+  const [busy, setBusy] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let active = true;
+    async function load() {
+      const { data } = await supabase
+        .from("learning_materials")
+        .select("id, title, subject, module, course, file_url, created_at")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (active) setItems((data ?? []) as MaterialRow[]);
+    }
+    load();
+    const ch = supabase
+      .channel("admin:materials")
+      .on("postgres_changes", { event: "*", schema: "public", table: "learning_materials" }, () => load())
+      .subscribe();
+    return () => { active = false; supabase.removeChannel(ch); };
+  }, []);
+
+  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setBusy(true);
+    try {
+      const ext = file.name.split(".").pop() || "bin";
+      const path = `materials/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error } = await supabase.storage.from("student-documents").upload(path, file, {
+        contentType: file.type, upsert: false,
+      });
+      if (error) throw error;
+      const { data: signed } = await supabase.storage.from("student-documents").createSignedUrl(path, 60 * 60 * 24 * 365);
+      setFileUrl(signed?.signedUrl ?? path);
+      if (!title) setTitle(file.name.replace(/\.[^.]+$/, ""));
+      toast.success("File uploaded");
+    } catch (err) {
+      console.warn(err);
+      toast.error("File upload failed — paste a link instead");
+    } finally { setBusy(false); }
+  }
+
+  async function publish() {
+    if (!title.trim() || !subject.trim() || !fileUrl.trim()) {
+      toast.error("Title, subject and file/link are required");
+      return;
+    }
+    setBusy(true);
+    const { error } = await supabase.from("learning_materials").insert({
+      title: title.trim(),
+      subject: subject.trim(),
+      module: moduleName.trim() || null,
+      course: course.trim() || null,
+      description: description.trim() || null,
+      file_url: fileUrl.trim(),
+    });
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    setTitle(""); setSubject(""); setModuleName(""); setCourse(""); setFileUrl(""); setDescription("");
+    toast.success("Published to student feed");
+  }
+
+  async function remove(id: string) {
+    await supabase.from("learning_materials").delete().eq("id", id);
+  }
+
+  return (
+    <div className="rounded-2xl bg-surface shadow-soft p-4">
+      <h2 className="text-base font-bold flex items-center gap-2">
+        <BookOpen className="w-4 h-4 text-primary" /> Upload Learning Material
+      </h2>
+      <p className="text-xs text-muted-foreground">PPTs or notes published instantly to students.</p>
+
+      <div className="mt-4 space-y-3">
+        <MiniField label="Title" v={title} onChange={setTitle} placeholder="Unit 3 — Data Structures" />
+        <div className="grid grid-cols-2 gap-3">
+          <MiniField label="Subject" v={subject} onChange={setSubject} placeholder="DSA" />
+          <MiniField label="Module" v={moduleName} onChange={setModuleName} placeholder="Module 3" />
+        </div>
+        <MiniField label="Course (optional)" v={course} onChange={setCourse} placeholder="B.Tech" />
+        <div>
+          <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Description</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={2}
+            placeholder="Short description (optional)"
+            className="mt-1.5 w-full px-3 py-2 rounded-xl bg-secondary outline-none text-sm font-medium border border-transparent focus:border-primary focus:bg-surface transition-all resize-none"
+          />
+        </div>
+        <div>
+          <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">File or Link</label>
+          <div className="mt-1.5 flex items-center gap-2">
+            <input
+              value={fileUrl}
+              onChange={(e) => setFileUrl(e.target.value)}
+              placeholder="https://… or upload file"
+              className="flex-1 h-11 px-3 rounded-xl bg-secondary outline-none text-sm font-medium border border-transparent focus:border-primary focus:bg-surface transition-all"
+            />
+            <input ref={fileRef} type="file" className="hidden" onChange={onFile} accept=".ppt,.pptx,.pdf,.doc,.docx,image/*" />
+            <button
+              onClick={() => fileRef.current?.click()}
+              disabled={busy}
+              className="h-11 px-3 rounded-xl bg-secondary border border-border font-bold text-xs flex items-center gap-1.5"
+            >
+              <Upload className="w-3.5 h-3.5" /> File
+            </button>
+          </div>
+        </div>
+        <button
+          onClick={publish}
+          disabled={busy}
+          className="w-full h-12 rounded-2xl gradient-primary text-primary-foreground font-bold text-sm flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-70"
+        >
+          {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Working…</> : <><Send className="w-4 h-4" /> Publish to Students</>}
+        </button>
+      </div>
+
+      {items.length > 0 && (
+        <div className="mt-5">
+          <h3 className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Recent uploads</h3>
+          <ul className="divide-y divide-border">
+            {items.map((m) => (
+              <li key={m.id} className="py-2.5 flex items-center gap-3">
+                <FileText className="w-4 h-4 text-primary shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold truncate">{m.title}</p>
+                  <p className="text-[10px] text-muted-foreground truncate">
+                    {m.subject}{m.module ? ` · ${m.module}` : ""} · {formatISTDate(m.created_at)}
+                  </p>
+                </div>
+                <button
+                  onClick={() => remove(m.id)}
+                  className="w-8 h-8 rounded-lg grid place-items-center text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  aria-label="Delete"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MiniField({ label, v, onChange, placeholder }: { label: string; v: string; onChange: (v: string) => void; placeholder?: string }) {
+  return (
+    <div>
+      <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{label}</label>
+      <input
+        value={v}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="mt-1.5 w-full h-11 px-3 rounded-xl bg-secondary outline-none text-sm font-semibold border border-transparent focus:border-primary focus:bg-surface transition-all"
+      />
+    </div>
+  );
+}
+
+
 /* ============================ Doc Preview Modal ============================ */
 
 function DocPreviewModal({ doc, onClose }: { doc: DocRow; onClose: () => void }) {
