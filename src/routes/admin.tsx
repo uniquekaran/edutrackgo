@@ -3,8 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Users, ShieldCheck, Megaphone, LogOut, CheckCircle2, XCircle, Send,
   FileText, Search, ChevronRight, X, Loader2, BarChart3,
-  CalendarCheck, AlertTriangle,
+  CalendarCheck, AlertTriangle, BookOpen, Upload, Trash2,
 } from "lucide-react";
+
 import { MobileShell } from "@/components/MobileShell";
 import { useStore, signOut as clearLocalUser, broadcast } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
