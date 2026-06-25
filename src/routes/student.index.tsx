@@ -1,10 +1,12 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Calendar, CheckCircle2, TrendingUp, Sparkles, LogOut } from "lucide-react";
+import { Calendar, CheckCircle2, TrendingUp, Sparkles, LogOut, BookOpen, ChevronRight } from "lucide-react";
 import { attendanceStats, markAttendance, signOut as clearLocalUser, useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatISTDay } from "@/lib/format";
+import { TodoWidget } from "@/components/TodoWidget";
+
 
 export const Route = createFileRoute("/student/")({
   head: () => ({ meta: [{ title: "Dashboard — EduTrack" }] }),
@@ -92,6 +94,28 @@ function StudentDashboard() {
       </section>
 
       <section className="px-5 mt-6">
+        <Link
+          to="/student/materials"
+          className="block rounded-2xl bg-surface shadow-soft p-4 active:scale-[0.99] transition-transform"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-2xl gradient-primary text-primary-foreground grid place-items-center shrink-0">
+              <BookOpen className="w-5 h-5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold">Academic Modules & PPTs</p>
+              <p className="text-[11px] text-muted-foreground">Browse subject-wise study material</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
+          </div>
+        </Link>
+      </section>
+
+      <section className="px-5 mt-4">
+        <TodoWidget userId={user.id} />
+      </section>
+
+      <section className="px-5 mt-6">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-bold">Recent attendance</h2>
         </div>
@@ -115,6 +139,7 @@ function StudentDashboard() {
           ))}
         </div>
       </section>
+
     </div>
   );
 }
