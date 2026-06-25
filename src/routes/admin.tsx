@@ -299,9 +299,47 @@ function Roster({
 
 /* =================== Student Profile + Docs side-panel =================== */
 
+interface StudentDetail {
+  full_name: string | null;
+  course: string | null;
+  semester: string | null;
+  roll_number: string | null;
+  father_name: string | null;
+  mother_name: string | null;
+  college_name: string | null;
+  blood_group: string | null;
+  avatar_url: string | null;
+}
+
 function StudentProfilePanel({
   student, docs, onClose, onPreview,
 }: { student: StudentRow; docs: DocRow[]; onClose: () => void; onPreview: (d: DocRow) => void }) {
+  const [bio, setBio] = useState<StudentDetail | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("student_profiles_detail")
+          .select("full_name, course, semester, roll_number, father_name, mother_name, college_name, blood_group, avatar_url")
+          .eq("user_id", student.id)
+          .maybeSingle();
+        if (!active) return;
+        setBio(data as StudentDetail | null);
+        const path = data?.avatar_url;
+        if (path && !path.startsWith("http") && !path.startsWith("blob:") && !path.startsWith("data:")) {
+          const { data: signed } = await supabase.storage.from("student-avatars").createSignedUrl(path, 60 * 60 * 24);
+          if (active && signed?.signedUrl) setAvatarUrl(signed.signedUrl);
+        } else if (path) {
+          setAvatarUrl(path);
+        }
+      } catch (e) { console.warn(e); }
+    })();
+    return () => { active = false; };
+  }, [student.id]);
+
   async function setStatus(id: string, status: DocStatus) {
     const { error } = await supabase.from("documents").update({ status }).eq("id", id);
     if (error) { toast.error(error.message); return; }
@@ -315,11 +353,15 @@ function StudentProfilePanel({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="p-5 border-b border-border flex items-start gap-3">
-          <div className="w-12 h-12 rounded-2xl gradient-primary text-primary-foreground grid place-items-center font-black shrink-0">
-            {(student.full_name ?? "?").split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()}
+          <div className="w-14 h-14 rounded-2xl gradient-primary text-primary-foreground grid place-items-center font-black shrink-0 overflow-hidden">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+            ) : (
+              (bio?.full_name ?? student.full_name ?? "?").split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()
+            )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-base font-bold truncate">{student.full_name ?? "Unnamed student"}</p>
+            <p className="text-base font-bold truncate">{bio?.full_name ?? student.full_name ?? "Unnamed student"}</p>
             <p className="text-xs text-muted-foreground truncate">{student.email}</p>
             <p className="text-[10px] text-muted-foreground/80 truncate mt-0.5 font-mono">UID: {student.id}</p>
             {student.department && (
@@ -330,6 +372,7 @@ function StudentProfilePanel({
             <X className="w-4 h-4" />
           </button>
         </div>
+
 
         <div className="flex-1 overflow-y-auto p-5 space-y-3">
           <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">All documents</h3>
