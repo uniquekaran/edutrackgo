@@ -214,7 +214,7 @@ function Ring({ pct }: { pct: number }) {
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-surface shadow-soft p-4">
+    <div className="rounded-2xl glass shadow-soft p-4">
       <div className="flex items-center gap-1.5 text-muted-foreground">
         {icon}
         <span className="text-[11px] font-bold uppercase tracking-wider">{label}</span>
