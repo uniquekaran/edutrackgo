@@ -57,18 +57,23 @@ export function TodoWidget({ userId }: { userId: string }) {
 
   const open = (items ?? []).filter((t) => !t.done);
   const done = (items ?? []).filter((t) => t.done);
+  const total = (items ?? []).length;
+  const pct = total === 0 ? 0 : Math.round((done.length / total) * 100);
 
   return (
-    <div className="rounded-2xl bg-surface shadow-soft p-4">
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-xl gradient-primary text-primary-foreground grid place-items-center">
-          <ListTodo className="w-4 h-4" />
+    <div className="rounded-2xl glass shadow-soft p-4">
+      <div className="flex items-center gap-3">
+        <TodoRing pct={pct} />
+        <div className="flex-1 min-w-0">
+          <h2 className="text-base font-bold flex items-center gap-1.5">
+            <ListTodo className="w-4 h-4 text-primary" /> My Tasks
+          </h2>
+          <p className="text-[11px] text-muted-foreground font-medium">
+            {done.length}/{total || 0} done · {open.length} open
+          </p>
         </div>
-        <h2 className="text-base font-bold flex-1">My Tasks</h2>
-        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-          {open.length} open
-        </span>
       </div>
+
 
       <div className="mt-3 flex items-center gap-2">
         <input
