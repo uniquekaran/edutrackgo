@@ -105,6 +105,27 @@ function StudentDashboard() {
       </section>
 
       <section className="px-5 mt-6">
+        <div className="flex items-center justify-between mb-2.5">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Quick links</h2>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <QuickLink
+            to="/student/materials"
+            label="Syllabus"
+            hint="Curriculum & modules"
+            icon={<FileSpreadsheet className="w-5 h-5" />}
+          />
+          <QuickLink
+            to="/student/materials"
+            label="Time Table"
+            hint="Weekly schedule"
+            icon={<CalendarClock className="w-5 h-5" />}
+          />
+        </div>
+      </section>
+
+      <section className="px-5 mt-4">
+
         <Link
           to="/student/materials"
           className="block rounded-2xl bg-surface shadow-soft p-4 active:scale-[0.99] transition-transform"
