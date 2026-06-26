@@ -74,7 +74,8 @@ function StudentDashboard() {
 
 
       <section className="px-5 -mt-12">
-        <div className="rounded-3xl bg-surface shadow-elevated p-5">
+        <div className="rounded-3xl glass-strong shadow-elevated p-5">
+
           <div className="flex items-center gap-5">
             <Ring pct={stats.pct} />
             <div className="flex-1 min-w-0">
