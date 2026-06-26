@@ -155,13 +155,17 @@ function AdminConsole() {
             <p className="text-xs uppercase tracking-widest opacity-80">Admin Console</p>
             <h1 className="text-2xl font-black mt-0.5">Hello, {firstName}</h1>
           </div>
-          <button
-            onClick={handleSignOut}
-            className="w-10 h-10 rounded-xl bg-white/15 grid place-items-center"
-            aria-label="Sign out"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <ThemeToggle variant="onPrimary" />
+            <button
+              onClick={handleSignOut}
+              className="w-10 h-10 rounded-xl bg-white/15 grid place-items-center active:scale-90 transition-transform"
+              aria-label="Sign out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+
         </div>
         <div className="grid grid-cols-3 gap-2 mt-5">
           <KPI label="Students" value={students.length} />
