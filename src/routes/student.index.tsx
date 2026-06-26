@@ -14,8 +14,10 @@ import { RouteSkeleton } from "@/components/RouteSkeleton";
 
 export const Route = createFileRoute("/student/")({
   head: () => ({ meta: [{ title: "Dashboard — EduTrack" }] }),
+  pendingComponent: RouteSkeleton,
   component: StudentDashboard,
 });
+
 
 function StudentDashboard() {
   const navigate = useNavigate();
