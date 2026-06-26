@@ -59,15 +59,19 @@ function StudentDashboard() {
             <h1 className="mt-1 text-2xl font-black truncate">Hi, {user.name?.split(" ")[0] ?? "there"} 👋</h1>
             <p className="text-sm opacity-90 mt-0.5 truncate">{user.department ?? "Student"}</p>
           </div>
-          <button
-            onClick={handleSignOut}
-            aria-label="Sign out"
-            className="w-10 h-10 rounded-xl bg-white/15 grid place-items-center shrink-0 active:scale-95 transition-transform"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <ThemeToggle variant="onPrimary" />
+            <button
+              onClick={handleSignOut}
+              aria-label="Sign out"
+              className="w-10 h-10 rounded-xl bg-white/15 grid place-items-center active:scale-90 transition-transform"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </header>
+
 
       <section className="px-5 -mt-12">
         <div className="rounded-3xl bg-surface shadow-elevated p-5">
