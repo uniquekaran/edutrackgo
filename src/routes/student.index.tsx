@@ -224,6 +224,27 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
   );
 }
 
+function QuickLink({ to, label, hint, icon }: { to: string; label: string; hint: string; icon: React.ReactNode }) {
+  return (
+    <Link
+      to={to}
+      className="group relative overflow-hidden rounded-2xl glass shadow-soft p-3.5 active:scale-[0.97] transition-transform"
+    >
+      <div className="absolute -right-6 -top-6 w-20 h-20 rounded-full gradient-primary opacity-10 group-hover:opacity-20 transition-opacity" />
+      <div className="relative flex items-start gap-2.5">
+        <div className="w-9 h-9 rounded-xl gradient-primary text-primary-foreground grid place-items-center shrink-0 shadow-soft">
+          {icon}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-bold leading-tight">{label}</p>
+          <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{hint}</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+
 function withinDays(date: string, days: number) {
   const d = new Date(date).getTime();
   return Date.now() - d < days * 86400000;
