@@ -566,13 +566,45 @@ function Analytics({
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const departments = useMemo(() => {
+    const set = new Set<string>();
+    students.forEach((s) => s.department && set.add(s.department));
+    return Array.from(set).sort();
+  }, [students]);
+  const [scope, setScope] = useState<string>("ALL");
+  const [priority, setPriority] = useState<"normal" | "urgent">("normal");
 
   function push() {
     if (!title.trim() || !body.trim()) { toast.error("Title and body required"); return; }
-    broadcast({ title: title.trim(), body: body.trim(), authorName });
+    const prefix = priority === "urgent" ? "🚨 URGENT · " : "";
+    const audience = scope === "ALL" ? "All students" : scope;
+    const recipients =
+      scope === "ALL" ? students.length : students.filter((s) => s.department === scope).length;
+    broadcast({
+      title: prefix + title.trim(),
+      body: `[Audience: ${audience}]\n${body.trim()}`,
+      authorName,
+    });
     setTitle(""); setBody("");
-    toast.success("Broadcast pushed to all students");
+    toast.success(`Sent to ${recipients} student${recipients === 1 ? "" : "s"} · ${audience}`);
   }
+
+  // 7-day activity series (attendance count per day)
+  const activitySeries = useMemo(() => {
+    const days: { date: string; label: string; count: number }[] = [];
+    const fmt = new Intl.DateTimeFormat("en-IN", { weekday: "short", timeZone: "Asia/Kolkata" });
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const iso = d.toISOString().slice(0, 10);
+      days.push({
+        date: iso,
+        label: fmt.format(d),
+        count: attendance.filter((a) => a.date === iso).length,
+      });
+    }
+    return days;
+  }, [attendance]);
 
   return (
     <div className="px-5 pt-5 space-y-5">
@@ -583,10 +615,66 @@ function Analytics({
       </div>
 
       <section>
+        <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+          <Activity className="w-3.5 h-3.5" /> Student activity · last 7 days
+        </h2>
+        <div className="rounded-2xl glass shadow-soft p-3 pt-4">
+          <div style={{ width: "100%", height: 180 }}>
+            <ResponsiveContainer>
+              <LineChart data={activitySeries} margin={{ top: 4, right: 10, left: -22, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="actGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="var(--color-primary)" />
+                    <stop offset="100%" stopColor="var(--color-primary-glow)" />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
+                <XAxis
+                  dataKey="label"
+                  tick={{ fontSize: 10, fill: "var(--color-muted-foreground)" }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  allowDecimals={false}
+                  tick={{ fontSize: 10, fill: "var(--color-muted-foreground)" }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={28}
+                />
+                <Tooltip
+                  cursor={{ stroke: "var(--color-primary)", strokeOpacity: 0.2 }}
+                  contentStyle={{
+                    background: "var(--color-surface)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: 12,
+                    fontSize: 12,
+                  }}
+                  labelStyle={{ fontWeight: 700 }}
+                  formatter={(v: number) => [`${v} check-ins`, "Activity"]}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="count"
+                  stroke="url(#actGrad)"
+                  strokeWidth={3}
+                  dot={{ r: 3, fill: "var(--color-primary)", strokeWidth: 0 }}
+                  activeDot={{ r: 5 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <p className="text-[10px] text-muted-foreground text-center mt-1">
+            Live check-ins synced from the attendance store.
+          </p>
+        </div>
+      </section>
+
+      <section>
         <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-2">
           Live attendance · today
         </h2>
-        <div className="rounded-2xl bg-surface shadow-soft p-4">
+        <div className="rounded-2xl glass shadow-soft p-4">
           {presentToday.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               No check-ins recorded yet today.
@@ -611,12 +699,55 @@ function Analytics({
         </div>
       </section>
 
-      <div className="rounded-2xl bg-surface shadow-soft p-4">
+      <div className="rounded-2xl glass shadow-soft p-4">
         <h2 className="text-base font-bold flex items-center gap-2">
-          <Megaphone className="w-4 h-4 text-primary" /> Broadcast
+          <Megaphone className="w-4 h-4 text-primary" /> Bulk Announcement
         </h2>
-        <p className="text-xs text-muted-foreground">Pushed instantly to every student feed.</p>
+        <p className="text-xs text-muted-foreground">
+          Target an audience and push instantly to every student feed.
+        </p>
         <div className="mt-4 space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Audience</label>
+              <select
+                value={scope}
+                onChange={(e) => setScope(e.target.value)}
+                className="mt-1.5 w-full h-12 px-3 rounded-xl bg-secondary outline-none text-sm font-semibold border border-transparent focus:border-primary"
+              >
+                <option value="ALL">All students ({students.length})</option>
+                {departments.map((d) => (
+                  <option key={d} value={d}>
+                    {d} ({students.filter((s) => s.department === d).length})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Priority</label>
+              <div className="mt-1.5 grid grid-cols-2 gap-1 p-1 bg-secondary rounded-xl h-12">
+                <button
+                  type="button"
+                  onClick={() => setPriority("normal")}
+                  className={`rounded-lg text-xs font-bold transition-all ${
+                    priority === "normal" ? "bg-surface shadow-soft" : "text-muted-foreground"
+                  }`}
+                >
+                  Normal
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPriority("urgent")}
+                  className={`rounded-lg text-xs font-bold transition-all ${
+                    priority === "urgent" ? "bg-destructive text-destructive-foreground shadow-soft" : "text-muted-foreground"
+                  }`}
+                >
+                  Urgent
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Title</label>
             <input
@@ -640,12 +771,14 @@ function Analytics({
             onClick={push}
             className="w-full h-14 py-3.5 rounded-2xl gradient-primary text-primary-foreground font-bold shadow-elevated active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
           >
-            <Send className="w-4 h-4" /> Send Announcement
+            <Send className="w-4 h-4" /> Send to {scope === "ALL" ? "everyone" : scope}
           </button>
         </div>
       </div>
 
       <LearningMaterialUploader />
+
+
 
 
       {announcements.length > 0 && (
