@@ -1,17 +1,23 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Calendar, CheckCircle2, TrendingUp, Sparkles, LogOut, BookOpen, ChevronRight } from "lucide-react";
+import { Calendar, CheckCircle2, TrendingUp, Sparkles, LogOut, BookOpen, ChevronRight, FileSpreadsheet, CalendarClock } from "lucide-react";
 import { attendanceStats, markAttendance, signOut as clearLocalUser, useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatISTDay } from "@/lib/format";
 import { TodoWidget } from "@/components/TodoWidget";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { RouteSkeleton } from "@/components/RouteSkeleton";
+
+
 
 
 export const Route = createFileRoute("/student/")({
   head: () => ({ meta: [{ title: "Dashboard — EduTrack" }] }),
+  pendingComponent: RouteSkeleton,
   component: StudentDashboard,
 });
+
 
 function StudentDashboard() {
   const navigate = useNavigate();
@@ -53,18 +59,23 @@ function StudentDashboard() {
             <h1 className="mt-1 text-2xl font-black truncate">Hi, {user.name?.split(" ")[0] ?? "there"} 👋</h1>
             <p className="text-sm opacity-90 mt-0.5 truncate">{user.department ?? "Student"}</p>
           </div>
-          <button
-            onClick={handleSignOut}
-            aria-label="Sign out"
-            className="w-10 h-10 rounded-xl bg-white/15 grid place-items-center shrink-0 active:scale-95 transition-transform"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <ThemeToggle variant="onPrimary" />
+            <button
+              onClick={handleSignOut}
+              aria-label="Sign out"
+              className="w-10 h-10 rounded-xl bg-white/15 grid place-items-center active:scale-90 transition-transform"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </header>
 
+
       <section className="px-5 -mt-12">
-        <div className="rounded-3xl bg-surface shadow-elevated p-5">
+        <div className="rounded-3xl glass-strong shadow-elevated p-5">
+
           <div className="flex items-center gap-5">
             <Ring pct={stats.pct} />
             <div className="flex-1 min-w-0">
@@ -94,9 +105,30 @@ function StudentDashboard() {
       </section>
 
       <section className="px-5 mt-6">
+        <div className="flex items-center justify-between mb-2.5">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Quick links</h2>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <QuickLink
+            to="/student/materials"
+            label="Syllabus"
+            hint="Curriculum & modules"
+            icon={<FileSpreadsheet className="w-5 h-5" />}
+          />
+          <QuickLink
+            to="/student/materials"
+            label="Time Table"
+            hint="Weekly schedule"
+            icon={<CalendarClock className="w-5 h-5" />}
+          />
+        </div>
+      </section>
+
+      <section className="px-5 mt-4">
+
         <Link
           to="/student/materials"
-          className="block rounded-2xl bg-surface shadow-soft p-4 active:scale-[0.99] transition-transform"
+          className="block rounded-2xl glass shadow-soft p-4 active:scale-[0.99] transition-transform"
         >
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-2xl gradient-primary text-primary-foreground grid place-items-center shrink-0">
@@ -119,7 +151,7 @@ function StudentDashboard() {
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-bold">Recent attendance</h2>
         </div>
-        <div className="rounded-2xl bg-surface shadow-soft divide-y divide-border">
+        <div className="rounded-2xl glass shadow-soft divide-y divide-border">
           {recent.length === 0 && (
             <p className="p-5 text-sm text-muted-foreground text-center">No attendance yet. Mark today's!</p>
           )}
@@ -182,7 +214,7 @@ function Ring({ pct }: { pct: number }) {
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-surface shadow-soft p-4">
+    <div className="rounded-2xl glass shadow-soft p-4">
       <div className="flex items-center gap-1.5 text-muted-foreground">
         {icon}
         <span className="text-[11px] font-bold uppercase tracking-wider">{label}</span>
@@ -191,6 +223,27 @@ function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string
     </div>
   );
 }
+
+function QuickLink({ to, label, hint, icon }: { to: string; label: string; hint: string; icon: React.ReactNode }) {
+  return (
+    <Link
+      to={to}
+      className="group relative overflow-hidden rounded-2xl glass shadow-soft p-3.5 active:scale-[0.97] transition-transform"
+    >
+      <div className="absolute -right-6 -top-6 w-20 h-20 rounded-full gradient-primary opacity-10 group-hover:opacity-20 transition-opacity" />
+      <div className="relative flex items-start gap-2.5">
+        <div className="w-9 h-9 rounded-xl gradient-primary text-primary-foreground grid place-items-center shrink-0 shadow-soft">
+          {icon}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-bold leading-tight">{label}</p>
+          <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{hint}</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 
 function withinDays(date: string, days: number) {
   const d = new Date(date).getTime();

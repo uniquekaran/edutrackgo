@@ -57,18 +57,23 @@ export function TodoWidget({ userId }: { userId: string }) {
 
   const open = (items ?? []).filter((t) => !t.done);
   const done = (items ?? []).filter((t) => t.done);
+  const total = (items ?? []).length;
+  const pct = total === 0 ? 0 : Math.round((done.length / total) * 100);
 
   return (
-    <div className="rounded-2xl bg-surface shadow-soft p-4">
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-xl gradient-primary text-primary-foreground grid place-items-center">
-          <ListTodo className="w-4 h-4" />
+    <div className="rounded-2xl glass shadow-soft p-4">
+      <div className="flex items-center gap-3">
+        <TodoRing pct={pct} />
+        <div className="flex-1 min-w-0">
+          <h2 className="text-base font-bold flex items-center gap-1.5">
+            <ListTodo className="w-4 h-4 text-primary" /> My Tasks
+          </h2>
+          <p className="text-[11px] text-muted-foreground font-medium">
+            {done.length}/{total || 0} done · {open.length} open
+          </p>
         </div>
-        <h2 className="text-base font-bold flex-1">My Tasks</h2>
-        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-          {open.length} open
-        </span>
       </div>
+
 
       <div className="mt-3 flex items-center gap-2">
         <input
@@ -122,3 +127,40 @@ export function TodoWidget({ userId }: { userId: string }) {
     </div>
   );
 }
+
+function TodoRing({ pct }: { pct: number }) {
+  const size = 52;
+  const stroke = 6;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const offset = c - (pct / 100) * c;
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--color-secondary)" strokeWidth={stroke} fill="none" />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke="url(#todoring)"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          fill="none"
+          strokeDasharray={c}
+          strokeDashoffset={offset}
+          style={{ transition: "stroke-dashoffset 500ms ease" }}
+        />
+        <defs>
+          <linearGradient id="todoring" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="var(--color-primary)" />
+            <stop offset="100%" stopColor="var(--color-primary-glow)" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="absolute inset-0 grid place-items-center">
+        <span className="text-[11px] font-black">{pct}%</span>
+      </div>
+    </div>
+  );
+}
+
