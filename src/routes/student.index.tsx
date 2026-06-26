@@ -128,7 +128,7 @@ function StudentDashboard() {
 
         <Link
           to="/student/materials"
-          className="block rounded-2xl bg-surface shadow-soft p-4 active:scale-[0.99] transition-transform"
+          className="block rounded-2xl glass shadow-soft p-4 active:scale-[0.99] transition-transform"
         >
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-2xl gradient-primary text-primary-foreground grid place-items-center shrink-0">
