@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { BottomNav } from "@/components/BottomNav";
 import { MobileShell } from "@/components/MobileShell";
+import { RouteSkeleton } from "@/components/RouteSkeleton";
 import { store } from "@/lib/store";
 
 export const Route = createFileRoute("/student")({
@@ -10,8 +11,10 @@ export const Route = createFileRoute("/student")({
     if (!u) throw redirect({ to: "/auth" });
     if (u.role !== "student") throw redirect({ to: "/admin" });
   },
+  pendingComponent: RouteSkeleton,
   component: StudentLayout,
 });
+
 
 function StudentLayout() {
   return (
