@@ -38,8 +38,10 @@ interface StudentRow {
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin Console — EduTrack" }] }),
+  pendingComponent: RouteSkeleton,
   component: AdminConsole,
 });
+
 
 type Tab = "roster" | "documents" | "analytics";
 
