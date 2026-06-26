@@ -3,15 +3,19 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Users, ShieldCheck, Megaphone, LogOut, CheckCircle2, XCircle, Send,
   FileText, Search, ChevronRight, X, Loader2, BarChart3,
-  CalendarCheck, AlertTriangle, BookOpen, Upload, Trash2,
+  CalendarCheck, AlertTriangle, BookOpen, Upload, Trash2, Activity,
 } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 import { MobileShell } from "@/components/MobileShell";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { RouteSkeleton } from "@/components/RouteSkeleton";
 import { useStore, signOut as clearLocalUser, broadcast } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatISTDate, formatISTDateTime } from "@/lib/format";
 import { StatusTag, type DocStatus } from "./student.documents";
+
 
 const ADMIN_BYPASS_EMAIL = "630karan2@gmail.com";
 
