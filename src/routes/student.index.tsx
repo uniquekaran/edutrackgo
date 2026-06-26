@@ -1,11 +1,15 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Calendar, CheckCircle2, TrendingUp, Sparkles, LogOut, BookOpen, ChevronRight } from "lucide-react";
+import { Calendar, CheckCircle2, TrendingUp, Sparkles, LogOut, BookOpen, ChevronRight, FileSpreadsheet, CalendarClock } from "lucide-react";
 import { attendanceStats, markAttendance, signOut as clearLocalUser, useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatISTDay } from "@/lib/format";
 import { TodoWidget } from "@/components/TodoWidget";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { RouteSkeleton } from "@/components/RouteSkeleton";
+
+
 
 
 export const Route = createFileRoute("/student/")({
