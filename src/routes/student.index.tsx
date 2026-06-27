@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Calendar, CheckCircle2, TrendingUp, Sparkles, LogOut, BookOpen, ChevronRight, FileSpreadsheet, CalendarClock } from "lucide-react";
+import { Calendar, CheckCircle2, TrendingUp, Sparkles, LogOut, BookOpen, ChevronRight, FileSpreadsheet, CalendarClock, ShieldCheck, ScrollText } from "lucide-react";
 import { attendanceStats, markAttendance, signOut as clearLocalUser, useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -109,6 +109,18 @@ function StudentDashboard() {
           <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Quick links</h2>
         </div>
         <div className="grid grid-cols-2 gap-3">
+          <QuickLink
+            to="/student/vault"
+            label="Documents Vault"
+            hint="Aadhaar, ID, Marksheets"
+            icon={<ShieldCheck className="w-5 h-5" />}
+          />
+          <QuickLink
+            to="/student/noc"
+            label="NOC Requests"
+            hint="Leave & event approvals"
+            icon={<ScrollText className="w-5 h-5" />}
+          />
           <QuickLink
             to="/student/materials"
             label="Syllabus"
