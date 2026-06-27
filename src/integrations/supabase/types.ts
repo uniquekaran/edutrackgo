@@ -86,6 +86,51 @@ export type Database = {
         }
         Relationships: []
       }
+      noc_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          event_name: string | null
+          from_date: string | null
+          id: string
+          reason: string
+          request_type: Database["public"]["Enums"]["noc_type"]
+          status: Database["public"]["Enums"]["noc_status"]
+          student_id: string
+          student_name: string
+          to_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          event_name?: string | null
+          from_date?: string | null
+          id?: string
+          reason: string
+          request_type?: Database["public"]["Enums"]["noc_type"]
+          status?: Database["public"]["Enums"]["noc_status"]
+          student_id: string
+          student_name: string
+          to_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          event_name?: string | null
+          from_date?: string | null
+          id?: string
+          reason?: string
+          request_type?: Database["public"]["Enums"]["noc_type"]
+          status?: Database["public"]["Enums"]["noc_status"]
+          student_id?: string
+          student_name?: string
+          to_date?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -230,6 +275,8 @@ export type Database = {
     }
     Enums: {
       app_role: "student" | "admin"
+      noc_status: "pending" | "approved" | "rejected"
+      noc_type: "leave" | "event" | "internship" | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -358,6 +405,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["student", "admin"],
+      noc_status: ["pending", "approved", "rejected"],
+      noc_type: ["leave", "event", "internship", "other"],
     },
   },
 } as const
