@@ -14,7 +14,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StudentIndexRouteImport } from './routes/student.index'
+import { Route as StudentVaultRouteImport } from './routes/student.vault'
 import { Route as StudentProfileRouteImport } from './routes/student.profile'
+import { Route as StudentNocRouteImport } from './routes/student.noc'
 import { Route as StudentMaterialsRouteImport } from './routes/student.materials'
 import { Route as StudentDocumentsRouteImport } from './routes/student.documents'
 import { Route as StudentAnnouncementsRouteImport } from './routes/student.announcements'
@@ -44,9 +46,19 @@ const StudentIndexRoute = StudentIndexRouteImport.update({
   path: '/',
   getParentRoute: () => StudentRoute,
 } as any)
+const StudentVaultRoute = StudentVaultRouteImport.update({
+  id: '/vault',
+  path: '/vault',
+  getParentRoute: () => StudentRoute,
+} as any)
 const StudentProfileRoute = StudentProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentNocRoute = StudentNocRouteImport.update({
+  id: '/noc',
+  path: '/noc',
   getParentRoute: () => StudentRoute,
 } as any)
 const StudentMaterialsRoute = StudentMaterialsRouteImport.update({
@@ -73,7 +85,9 @@ export interface FileRoutesByFullPath {
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
   '/student/materials': typeof StudentMaterialsRoute
+  '/student/noc': typeof StudentNocRoute
   '/student/profile': typeof StudentProfileRoute
+  '/student/vault': typeof StudentVaultRoute
   '/student/': typeof StudentIndexRoute
 }
 export interface FileRoutesByTo {
@@ -83,7 +97,9 @@ export interface FileRoutesByTo {
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
   '/student/materials': typeof StudentMaterialsRoute
+  '/student/noc': typeof StudentNocRoute
   '/student/profile': typeof StudentProfileRoute
+  '/student/vault': typeof StudentVaultRoute
   '/student': typeof StudentIndexRoute
 }
 export interface FileRoutesById {
@@ -95,7 +111,9 @@ export interface FileRoutesById {
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
   '/student/materials': typeof StudentMaterialsRoute
+  '/student/noc': typeof StudentNocRoute
   '/student/profile': typeof StudentProfileRoute
+  '/student/vault': typeof StudentVaultRoute
   '/student/': typeof StudentIndexRoute
 }
 export interface FileRouteTypes {
@@ -108,7 +126,9 @@ export interface FileRouteTypes {
     | '/student/announcements'
     | '/student/documents'
     | '/student/materials'
+    | '/student/noc'
     | '/student/profile'
+    | '/student/vault'
     | '/student/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -118,7 +138,9 @@ export interface FileRouteTypes {
     | '/student/announcements'
     | '/student/documents'
     | '/student/materials'
+    | '/student/noc'
     | '/student/profile'
+    | '/student/vault'
     | '/student'
   id:
     | '__root__'
@@ -129,7 +151,9 @@ export interface FileRouteTypes {
     | '/student/announcements'
     | '/student/documents'
     | '/student/materials'
+    | '/student/noc'
     | '/student/profile'
+    | '/student/vault'
     | '/student/'
   fileRoutesById: FileRoutesById
 }
@@ -177,11 +201,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentIndexRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/student/vault': {
+      id: '/student/vault'
+      path: '/vault'
+      fullPath: '/student/vault'
+      preLoaderRoute: typeof StudentVaultRouteImport
+      parentRoute: typeof StudentRoute
+    }
     '/student/profile': {
       id: '/student/profile'
       path: '/profile'
       fullPath: '/student/profile'
       preLoaderRoute: typeof StudentProfileRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/noc': {
+      id: '/student/noc'
+      path: '/noc'
+      fullPath: '/student/noc'
+      preLoaderRoute: typeof StudentNocRouteImport
       parentRoute: typeof StudentRoute
     }
     '/student/materials': {
@@ -212,7 +250,9 @@ interface StudentRouteChildren {
   StudentAnnouncementsRoute: typeof StudentAnnouncementsRoute
   StudentDocumentsRoute: typeof StudentDocumentsRoute
   StudentMaterialsRoute: typeof StudentMaterialsRoute
+  StudentNocRoute: typeof StudentNocRoute
   StudentProfileRoute: typeof StudentProfileRoute
+  StudentVaultRoute: typeof StudentVaultRoute
   StudentIndexRoute: typeof StudentIndexRoute
 }
 
@@ -220,7 +260,9 @@ const StudentRouteChildren: StudentRouteChildren = {
   StudentAnnouncementsRoute: StudentAnnouncementsRoute,
   StudentDocumentsRoute: StudentDocumentsRoute,
   StudentMaterialsRoute: StudentMaterialsRoute,
+  StudentNocRoute: StudentNocRoute,
   StudentProfileRoute: StudentProfileRoute,
+  StudentVaultRoute: StudentVaultRoute,
   StudentIndexRoute: StudentIndexRoute,
 }
 

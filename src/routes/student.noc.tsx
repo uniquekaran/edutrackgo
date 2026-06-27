@@ -204,7 +204,7 @@ function NocCard({ row }: { row: NocRow }) {
         <div
           className="absolute left-7 top-3.5 h-[2px] rounded-full -z-10 transition-all duration-500"
           style={{
-            width: `calc(${(stepIndex / (STEPS.length - 1)) * 100}% - ${stepIndex === 0 ? 0 : 14}px)`,
+            width: `calc(${(stepIndex / (STEPS.length - 1)) * 100}% - 14px)`,
             background: isRejected ? "var(--color-destructive)" : "var(--color-primary)",
           }}
         />
