@@ -186,8 +186,9 @@ function VaultPage() {
             const Icon = cat.icon;
             const doc = latestByCategory.get(cat.key);
             const isUploading = uploadingKey === cat.key;
+            const isRejected = doc?.status === "rejected";
             return (
-              <div key={cat.key} className="relative overflow-hidden rounded-3xl glass-strong shadow-elevated p-4">
+              <div key={cat.key} className={`relative overflow-hidden rounded-3xl glass-strong shadow-elevated p-4 ${isRejected ? "neon-border" : ""}`}>
                 <div
                   aria-hidden
                   className={`absolute -right-10 -top-10 w-32 h-32 rounded-full bg-gradient-to-br ${cat.tint} blur-2xl opacity-60`}
@@ -202,33 +203,52 @@ function VaultPage() {
                       {doc ? <StatusBadge status={doc.status} /> : <EmptyBadge />}
                     </div>
                     <p className="text-[11px] text-muted-foreground mt-0.5">{cat.hint}</p>
-                    {doc && (
+                    {doc && !isRejected && (
                       <p className="text-[10px] text-muted-foreground/80 mt-1 flex items-center gap-1">
                         <Lock className="w-3 h-3" /> Stored {formatISTDateTime(doc.created_at)}
+                      </p>
+                    )}
+                    {isRejected && (
+                      <p className="text-[11px] text-rose-500 mt-1 font-semibold">
+                        Admin marked this rejected. Please re-upload a clearer copy.
                       </p>
                     )}
                   </div>
                 </div>
 
                 <div className="relative mt-4 flex gap-2">
-                  <button
-                    onClick={() => triggerUpload(cat.key)}
-                    disabled={isUploading}
-                    className="flex-1 h-11 rounded-2xl gradient-primary text-primary-foreground text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-soft active:scale-[0.98] transition disabled:opacity-70"
-                  >
-                    {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                    {isUploading ? "Securing…" : doc ? "Replace" : "Upload"}
-                  </button>
-                  <button
-                    onClick={() => doc && setPreview(doc)}
-                    disabled={!doc}
-                    className="h-11 px-4 rounded-2xl glass text-xs font-bold inline-flex items-center justify-center gap-1.5 disabled:opacity-40"
-                  >
-                    <Eye className="w-4 h-4" /> View
-                  </button>
+                  {isRejected ? (
+                    <button
+                      onClick={() => triggerUpload(cat.key)}
+                      disabled={isUploading}
+                      className="flex-1 h-11 rounded-2xl bg-rose-500/15 text-rose-500 border border-rose-500/30 text-xs font-bold inline-flex items-center justify-center gap-1.5 active:scale-[0.98] transition disabled:opacity-70"
+                    >
+                      {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                      {isUploading ? "Securing…" : "Re-upload Document"}
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => triggerUpload(cat.key)}
+                        disabled={isUploading}
+                        className="flex-1 h-11 rounded-2xl gradient-primary text-primary-foreground text-xs font-bold inline-flex items-center justify-center gap-1.5 shadow-soft active:scale-[0.98] transition disabled:opacity-70"
+                      >
+                        {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                        {isUploading ? "Securing…" : doc ? "Replace" : "Upload"}
+                      </button>
+                      <button
+                        onClick={() => doc && setPreview(doc)}
+                        disabled={!doc}
+                        className="h-11 px-4 rounded-2xl glass text-xs font-bold inline-flex items-center justify-center gap-1.5 disabled:opacity-40"
+                      >
+                        <Eye className="w-4 h-4" /> View
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             );
+
           })
         )}
       </section>
