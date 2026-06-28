@@ -243,6 +243,50 @@ function ProfilePage() {
         </button>
       </section>
 
+      {/* Verified Credentials Grid */}
+      <section className="px-5 mt-5">
+        <div className="rounded-3xl glass-strong shadow-elevated p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-bold flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-primary" /> Verified Credentials
+            </h2>
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-success/15 text-success border border-success/30">
+              {verifiedDocs.length} approved
+            </span>
+          </div>
+          {verifiedDocs.length === 0 ? (
+            <div className="text-center py-6">
+              <FileBadge className="w-7 h-7 mx-auto text-muted-foreground/60" />
+              <p className="mt-2 text-xs text-muted-foreground">No verified documents yet.</p>
+              <Link to="/student/vault" className="inline-block mt-3 text-[11px] font-bold text-primary underline-offset-2 hover:underline">
+                Open Documents Vault →
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {verifiedDocs.map((d) => (
+                <div key={d.id} className="relative overflow-hidden rounded-2xl glass neon-border p-3">
+                  <div className="absolute -right-6 -top-6 w-20 h-20 rounded-full gradient-primary opacity-15 blur-xl" aria-hidden />
+                  <div className="relative flex items-start gap-2">
+                    <div className="w-9 h-9 rounded-xl gradient-primary text-primary-foreground grid place-items-center shrink-0">
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[12px] font-bold leading-tight truncate">{d.document_type}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
+                        Verified · {formatISTDate(d.created_at)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+
+
       {/* Bio-data form */}
       <section className="px-5 mt-5">
         <div className="rounded-2xl bg-surface shadow-soft p-5 space-y-3">
