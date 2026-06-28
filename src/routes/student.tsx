@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { BottomNav } from "@/components/BottomNav";
-import { MobileShell } from "@/components/MobileShell";
+import { DesktopSidebar } from "@/components/DesktopSidebar";
 import { RouteSkeleton } from "@/components/RouteSkeleton";
 import { store } from "@/lib/store";
 
@@ -18,11 +18,18 @@ export const Route = createFileRoute("/student")({
 
 function StudentLayout() {
   return (
-    <MobileShell>
-      <div className="flex-1 overflow-y-auto">
-        <Outlet />
-      </div>
-      <BottomNav />
-    </MobileShell>
+    <div className="min-h-screen w-full flex bg-background">
+      <DesktopSidebar />
+      <main className="flex-1 min-w-0 flex flex-col">
+        <div className="flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-md md:max-w-3xl">
+            <Outlet />
+          </div>
+        </div>
+        <div className="md:hidden mx-auto w-full max-w-md">
+          <BottomNav />
+        </div>
+      </main>
+    </div>
   );
 }
