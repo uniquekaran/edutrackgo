@@ -73,8 +73,39 @@ function StudentDashboard() {
       </header>
 
 
-      <section className="px-5 -mt-12">
+      <section className="px-5 -mt-7 mb-4">
+        <div className="rounded-3xl glass-strong neon-border shadow-elevated p-3.5">
+          <div className="flex items-center justify-between mb-2.5">
+            <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+              <Sparkles className="w-3 h-3 text-primary" /> Quick Actions
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-2.5">
+            <a
+              href="https://www.aicte-india.org/sites/default/files/Model_Curriculum/UG_FINAL.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className="group relative overflow-hidden rounded-2xl gradient-primary text-primary-foreground p-3 active:scale-[0.97] transition-transform halo-glow"
+            >
+              <FileSpreadsheet className="w-5 h-5" />
+              <p className="mt-2 text-[12px] font-black leading-tight">Download Syllabus</p>
+              <p className="text-[9px] opacity-80 mt-0.5">PDF · Current semester</p>
+            </a>
+            <Link
+              to="/student/materials"
+              className="group relative overflow-hidden rounded-2xl glass p-3 active:scale-[0.97] transition-transform border border-primary/20"
+            >
+              <CalendarClock className="w-5 h-5 text-primary" />
+              <p className="mt-2 text-[12px] font-black leading-tight">View Live Time-Table</p>
+              <p className="text-[9px] text-muted-foreground mt-0.5">Updated weekly</p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-5">
         <div className="rounded-3xl glass-strong shadow-elevated p-5">
+
 
           <div className="flex items-center gap-5">
             <Ring pct={stats.pct} />

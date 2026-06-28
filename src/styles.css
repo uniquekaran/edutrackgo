@@ -169,3 +169,35 @@
 @utility shadow-elevated {
   box-shadow: var(--shadow-elevated);
 }
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+@utility skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--color-muted) 60%, transparent) 0%,
+    color-mix(in oklab, var(--color-foreground) 8%, transparent) 50%,
+    color-mix(in oklab, var(--color-muted) 60%, transparent) 100%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s linear infinite;
+  border-radius: 0.75rem;
+}
+
+@utility neon-border {
+  border: 1px solid color-mix(in oklab, var(--color-primary-glow) 35%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--color-primary-glow) 12%, transparent),
+    0 0 22px -6px color-mix(in oklab, var(--color-primary-glow) 50%, transparent),
+    inset 0 1px 0 color-mix(in oklab, var(--color-primary-glow) 18%, transparent);
+}
+
+@utility halo-glow {
+  box-shadow:
+    0 0 0 4px color-mix(in oklab, var(--color-primary-glow) 18%, transparent),
+    0 8px 30px -6px color-mix(in oklab, var(--color-primary-glow) 55%, transparent);
+}
+

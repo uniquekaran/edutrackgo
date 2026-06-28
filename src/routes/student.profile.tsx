@@ -1,14 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Camera, Loader2, Save, IdCard, User as UserIcon } from "lucide-react";
+import { Camera, Loader2, Save, IdCard, User as UserIcon, ShieldCheck, FileBadge } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { formatISTDate } from "@/lib/format";
+import { RouteSkeleton } from "@/components/RouteSkeleton";
 
 export const Route = createFileRoute("/student/profile")({
   head: () => ({ meta: [{ title: "My Profile — EduTrack" }] }),
+  pendingComponent: RouteSkeleton,
   component: ProfilePage,
 });
+
 
 const COURSES = ["B.Tech", "B.Pharma", "BCA", "B.Sc", "B.Com", "BA", "Poly", "Other"] as const;
 const BLOOD = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] as const;
@@ -40,7 +44,34 @@ function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string>("");
+  const [verifiedDocs, setVerifiedDocs] = useState<Array<{ id: string; document_type: string; created_at: string }>>([]);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadVerified() {
+      try {
+        const { data } = await supabase
+          .from("documents")
+          .select("id, document_type, created_at, status")
+          .eq("student_id", user.id)
+          .eq("status", "verified")
+          .order("created_at", { ascending: false });
+        if (mounted) setVerifiedDocs((data ?? []) as typeof verifiedDocs);
+      } catch (e) { console.warn(e); }
+    }
+    loadVerified();
+    const ch = supabase
+      .channel(`profile-verified:${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "documents", filter: `student_id=eq.${user.id}` },
+        () => loadVerified(),
+      )
+      .subscribe();
+    return () => { mounted = false; supabase.removeChannel(ch); };
+  }, [user.id]);
+
 
   useEffect(() => {
     let active = true;
@@ -211,6 +242,50 @@ function ProfilePage() {
           {uploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading…</> : <><Camera className="w-4 h-4" /> {avatarPreview ? "Change photo" : "Upload photo"}</>}
         </button>
       </section>
+
+      {/* Verified Credentials Grid */}
+      <section className="px-5 mt-5">
+        <div className="rounded-3xl glass-strong shadow-elevated p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-bold flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-primary" /> Verified Credentials
+            </h2>
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-success/15 text-success border border-success/30">
+              {verifiedDocs.length} approved
+            </span>
+          </div>
+          {verifiedDocs.length === 0 ? (
+            <div className="text-center py-6">
+              <FileBadge className="w-7 h-7 mx-auto text-muted-foreground/60" />
+              <p className="mt-2 text-xs text-muted-foreground">No verified documents yet.</p>
+              <Link to="/student/vault" className="inline-block mt-3 text-[11px] font-bold text-primary underline-offset-2 hover:underline">
+                Open Documents Vault →
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {verifiedDocs.map((d) => (
+                <div key={d.id} className="relative overflow-hidden rounded-2xl glass neon-border p-3">
+                  <div className="absolute -right-6 -top-6 w-20 h-20 rounded-full gradient-primary opacity-15 blur-xl" aria-hidden />
+                  <div className="relative flex items-start gap-2">
+                    <div className="w-9 h-9 rounded-xl gradient-primary text-primary-foreground grid place-items-center shrink-0">
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[12px] font-bold leading-tight truncate">{d.document_type}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
+                        Verified · {formatISTDate(d.created_at)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+
 
       {/* Bio-data form */}
       <section className="px-5 mt-5">

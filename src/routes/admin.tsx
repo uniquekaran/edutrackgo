@@ -466,7 +466,9 @@ function BioRow({ k, v, full }: { k: string; v?: string | null; full?: boolean }
 
 function DocumentsHub({ docs, onPreview }: { docs: DocRow[]; onPreview: (d: DocRow) => void }) {
   const pending = docs.filter((d) => d.status === "pending");
-  const recent = docs.filter((d) => d.status !== "pending").slice(0, 20);
+  // Rejected documents are removed from the active workspace; only verified items remain visible.
+  const recent = docs.filter((d) => d.status === "verified").slice(0, 20);
+
 
   async function setStatus(id: string, status: DocStatus) {
     const { error } = await supabase.from("documents").update({ status }).eq("id", id);
