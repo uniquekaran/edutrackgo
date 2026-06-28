@@ -44,7 +44,34 @@ function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState<string>("");
+  const [verifiedDocs, setVerifiedDocs] = useState<Array<{ id: string; document_type: string; created_at: string }>>([]);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadVerified() {
+      try {
+        const { data } = await supabase
+          .from("documents")
+          .select("id, document_type, created_at, status")
+          .eq("student_id", user.id)
+          .eq("status", "verified")
+          .order("created_at", { ascending: false });
+        if (mounted) setVerifiedDocs((data ?? []) as typeof verifiedDocs);
+      } catch (e) { console.warn(e); }
+    }
+    loadVerified();
+    const ch = supabase
+      .channel(`profile-verified:${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "documents", filter: `student_id=eq.${user.id}` },
+        () => loadVerified(),
+      )
+      .subscribe();
+    return () => { mounted = false; supabase.removeChannel(ch); };
+  }, [user.id]);
+
 
   useEffect(() => {
     let active = true;
