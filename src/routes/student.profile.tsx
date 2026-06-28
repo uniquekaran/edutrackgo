@@ -1,14 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Camera, Loader2, Save, IdCard, User as UserIcon } from "lucide-react";
+import { Camera, Loader2, Save, IdCard, User as UserIcon, ShieldCheck, FileBadge } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { formatISTDate } from "@/lib/format";
+import { RouteSkeleton } from "@/components/RouteSkeleton";
 
 export const Route = createFileRoute("/student/profile")({
   head: () => ({ meta: [{ title: "My Profile — EduTrack" }] }),
+  pendingComponent: RouteSkeleton,
   component: ProfilePage,
 });
+
 
 const COURSES = ["B.Tech", "B.Pharma", "BCA", "B.Sc", "B.Com", "BA", "Poly", "Other"] as const;
 const BLOOD = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"] as const;

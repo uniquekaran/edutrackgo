@@ -86,10 +86,29 @@ function VaultPage() {
       .channel(`vault:${user.id}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "documents", filter: `student_id=eq.${user.id}` },
+        { event: "UPDATE", schema: "public", table: "documents", filter: `student_id=eq.${user.id}` },
+        (payload) => {
+          const next = payload.new as DocRow;
+          const prev = payload.old as DocRow | null;
+          if (next?.status !== prev?.status) {
+            if (next.status === "verified") toast.success(`${next.document_type} approved ✓`);
+            else if (next.status === "rejected") toast.error(`${next.document_type} rejected — please re-upload`);
+          }
+          load();
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "documents", filter: `student_id=eq.${user.id}` },
+        () => load(),
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "documents", filter: `student_id=eq.${user.id}` },
         () => load(),
       )
       .subscribe();
+
     return () => {
       active = false;
       supabase.removeChannel(ch);
