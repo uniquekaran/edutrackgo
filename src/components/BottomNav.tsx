@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { LayoutDashboard, Sparkles, BookOpenCheck, GaugeCircle, User } from "lucide-react";
 
 export function BottomNav() {
