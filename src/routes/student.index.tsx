@@ -133,6 +133,18 @@ function StudentDashboard() {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <QuickLink
+            to="/student/exams"
+            label="Exam Portal"
+            hint="PYQs & model papers"
+            icon={<BookOpenCheck className="w-5 h-5" />}
+          />
+          <QuickLink
+            to="/student/tracker"
+            label="Academic Tracker"
+            hint="Attendance & tests"
+            icon={<GaugeCircle className="w-5 h-5" />}
+          />
+          <QuickLink
             to="/student/vault"
             label="Documents Vault"
             hint="Aadhaar, ID, Marksheets"
@@ -143,18 +155,6 @@ function StudentDashboard() {
             label="NOC Requests"
             hint="Leave & event approvals"
             icon={<ScrollText className="w-5 h-5" />}
-          />
-          <QuickLink
-            to="/student/materials"
-            label="Syllabus"
-            hint="Curriculum & modules"
-            icon={<FileSpreadsheet className="w-5 h-5" />}
-          />
-          <QuickLink
-            to="/student/materials"
-            label="Time Table"
-            hint="Weekly schedule"
-            icon={<CalendarClock className="w-5 h-5" />}
           />
         </div>
       </section>
