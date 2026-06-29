@@ -1,12 +1,11 @@
-import { Link } from "@tanstack/react-router";
-import { LayoutDashboard, ShieldCheck, ScrollText, BookOpen, User } from "lucide-react";
+import { LayoutDashboard, Sparkles, BookOpenCheck, GaugeCircle, User } from "lucide-react";
 
 export function BottomNav() {
   const items = [
     { to: "/student" as const, label: "Home", icon: LayoutDashboard, exact: true },
-    { to: "/student/vault" as const, label: "Vault", icon: ShieldCheck },
-    { to: "/student/noc" as const, label: "NOC", icon: ScrollText },
-    { to: "/student/materials" as const, label: "Learn", icon: BookOpen },
+    { to: "/student/eduai" as const, label: "EduAI", icon: Sparkles },
+    { to: "/student/exams" as const, label: "Exams", icon: BookOpenCheck },
+    { to: "/student/tracker" as const, label: "Tracker", icon: GaugeCircle },
     { to: "/student/profile" as const, label: "Me", icon: User },
   ];
   return (
