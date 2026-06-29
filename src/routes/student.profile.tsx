@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatISTDate } from "@/lib/format";
 import { RouteSkeleton } from "@/components/RouteSkeleton";
+import { CollegeSelect } from "@/components/CollegeSelect";
 
 export const Route = createFileRoute("/student/profile")({
   head: () => ({ meta: [{ title: "My Profile — EduTrack" }] }),
