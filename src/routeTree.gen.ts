@@ -15,6 +15,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StudentIndexRouteImport } from './routes/student.index'
 import { Route as StudentVaultRouteImport } from './routes/student.vault'
+import { Route as StudentTrackerRouteImport } from './routes/student.tracker'
 import { Route as StudentProfileRouteImport } from './routes/student.profile'
 import { Route as StudentNocRouteImport } from './routes/student.noc'
 import { Route as StudentMaterialsRouteImport } from './routes/student.materials'
@@ -51,6 +52,11 @@ const StudentIndexRoute = StudentIndexRouteImport.update({
 const StudentVaultRoute = StudentVaultRouteImport.update({
   id: '/vault',
   path: '/vault',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentTrackerRoute = StudentTrackerRouteImport.update({
+  id: '/tracker',
+  path: '/tracker',
   getParentRoute: () => StudentRoute,
 } as any)
 const StudentProfileRoute = StudentProfileRouteImport.update({
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/student/materials': typeof StudentMaterialsRoute
   '/student/noc': typeof StudentNocRoute
   '/student/profile': typeof StudentProfileRoute
+  '/student/tracker': typeof StudentTrackerRoute
   '/student/vault': typeof StudentVaultRoute
   '/student/': typeof StudentIndexRoute
 }
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/student/materials': typeof StudentMaterialsRoute
   '/student/noc': typeof StudentNocRoute
   '/student/profile': typeof StudentProfileRoute
+  '/student/tracker': typeof StudentTrackerRoute
   '/student/vault': typeof StudentVaultRoute
   '/student': typeof StudentIndexRoute
 }
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/student/materials': typeof StudentMaterialsRoute
   '/student/noc': typeof StudentNocRoute
   '/student/profile': typeof StudentProfileRoute
+  '/student/tracker': typeof StudentTrackerRoute
   '/student/vault': typeof StudentVaultRoute
   '/student/': typeof StudentIndexRoute
 }
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/student/materials'
     | '/student/noc'
     | '/student/profile'
+    | '/student/tracker'
     | '/student/vault'
     | '/student/'
   fileRoutesByTo: FileRoutesByTo
@@ -162,6 +172,7 @@ export interface FileRouteTypes {
     | '/student/materials'
     | '/student/noc'
     | '/student/profile'
+    | '/student/tracker'
     | '/student/vault'
     | '/student'
   id:
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/student/materials'
     | '/student/noc'
     | '/student/profile'
+    | '/student/tracker'
     | '/student/vault'
     | '/student/'
   fileRoutesById: FileRoutesById
@@ -230,6 +242,13 @@ declare module '@tanstack/react-router' {
       path: '/vault'
       fullPath: '/student/vault'
       preLoaderRoute: typeof StudentVaultRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/tracker': {
+      id: '/student/tracker'
+      path: '/tracker'
+      fullPath: '/student/tracker'
+      preLoaderRoute: typeof StudentTrackerRouteImport
       parentRoute: typeof StudentRoute
     }
     '/student/profile': {
@@ -292,6 +311,7 @@ interface StudentRouteChildren {
   StudentMaterialsRoute: typeof StudentMaterialsRoute
   StudentNocRoute: typeof StudentNocRoute
   StudentProfileRoute: typeof StudentProfileRoute
+  StudentTrackerRoute: typeof StudentTrackerRoute
   StudentVaultRoute: typeof StudentVaultRoute
   StudentIndexRoute: typeof StudentIndexRoute
 }
@@ -304,6 +324,7 @@ const StudentRouteChildren: StudentRouteChildren = {
   StudentMaterialsRoute: StudentMaterialsRoute,
   StudentNocRoute: StudentNocRoute,
   StudentProfileRoute: StudentProfileRoute,
+  StudentTrackerRoute: StudentTrackerRoute,
   StudentVaultRoute: StudentVaultRoute,
   StudentIndexRoute: StudentIndexRoute,
 }
