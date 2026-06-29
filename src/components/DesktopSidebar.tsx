@@ -6,6 +6,9 @@ import {
   BookOpen,
   GraduationCap,
   LogOut,
+  Sparkles,
+  BookOpenCheck,
+  GaugeCircle,
 } from "lucide-react";
 import { signOut as clearLocalUser, useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +18,9 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 
 const ITEMS = [
   { to: "/student" as const, label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { to: "/student/eduai" as const, label: "EduAI Assistant", icon: Sparkles },
+  { to: "/student/exams" as const, label: "Exam Portal & PYQs", icon: BookOpenCheck },
+  { to: "/student/tracker" as const, label: "Academic Tracker", icon: GaugeCircle },
   { to: "/student/vault" as const, label: "Documents Vault", icon: ShieldCheck },
   { to: "/student/noc" as const, label: "NOC Requests", icon: ScrollText },
   { to: "/student/materials" as const, label: "Academic Portal", icon: BookOpen },

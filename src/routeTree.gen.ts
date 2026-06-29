@@ -15,9 +15,12 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StudentIndexRouteImport } from './routes/student.index'
 import { Route as StudentVaultRouteImport } from './routes/student.vault'
+import { Route as StudentTrackerRouteImport } from './routes/student.tracker'
 import { Route as StudentProfileRouteImport } from './routes/student.profile'
 import { Route as StudentNocRouteImport } from './routes/student.noc'
 import { Route as StudentMaterialsRouteImport } from './routes/student.materials'
+import { Route as StudentExamsRouteImport } from './routes/student.exams'
+import { Route as StudentEduaiRouteImport } from './routes/student.eduai'
 import { Route as StudentDocumentsRouteImport } from './routes/student.documents'
 import { Route as StudentAnnouncementsRouteImport } from './routes/student.announcements'
 
@@ -51,6 +54,11 @@ const StudentVaultRoute = StudentVaultRouteImport.update({
   path: '/vault',
   getParentRoute: () => StudentRoute,
 } as any)
+const StudentTrackerRoute = StudentTrackerRouteImport.update({
+  id: '/tracker',
+  path: '/tracker',
+  getParentRoute: () => StudentRoute,
+} as any)
 const StudentProfileRoute = StudentProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -64,6 +72,16 @@ const StudentNocRoute = StudentNocRouteImport.update({
 const StudentMaterialsRoute = StudentMaterialsRouteImport.update({
   id: '/materials',
   path: '/materials',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentExamsRoute = StudentExamsRouteImport.update({
+  id: '/exams',
+  path: '/exams',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentEduaiRoute = StudentEduaiRouteImport.update({
+  id: '/eduai',
+  path: '/eduai',
   getParentRoute: () => StudentRoute,
 } as any)
 const StudentDocumentsRoute = StudentDocumentsRouteImport.update({
@@ -84,9 +102,12 @@ export interface FileRoutesByFullPath {
   '/student': typeof StudentRouteWithChildren
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
+  '/student/eduai': typeof StudentEduaiRoute
+  '/student/exams': typeof StudentExamsRoute
   '/student/materials': typeof StudentMaterialsRoute
   '/student/noc': typeof StudentNocRoute
   '/student/profile': typeof StudentProfileRoute
+  '/student/tracker': typeof StudentTrackerRoute
   '/student/vault': typeof StudentVaultRoute
   '/student/': typeof StudentIndexRoute
 }
@@ -96,9 +117,12 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
+  '/student/eduai': typeof StudentEduaiRoute
+  '/student/exams': typeof StudentExamsRoute
   '/student/materials': typeof StudentMaterialsRoute
   '/student/noc': typeof StudentNocRoute
   '/student/profile': typeof StudentProfileRoute
+  '/student/tracker': typeof StudentTrackerRoute
   '/student/vault': typeof StudentVaultRoute
   '/student': typeof StudentIndexRoute
 }
@@ -110,9 +134,12 @@ export interface FileRoutesById {
   '/student': typeof StudentRouteWithChildren
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
+  '/student/eduai': typeof StudentEduaiRoute
+  '/student/exams': typeof StudentExamsRoute
   '/student/materials': typeof StudentMaterialsRoute
   '/student/noc': typeof StudentNocRoute
   '/student/profile': typeof StudentProfileRoute
+  '/student/tracker': typeof StudentTrackerRoute
   '/student/vault': typeof StudentVaultRoute
   '/student/': typeof StudentIndexRoute
 }
@@ -125,9 +152,12 @@ export interface FileRouteTypes {
     | '/student'
     | '/student/announcements'
     | '/student/documents'
+    | '/student/eduai'
+    | '/student/exams'
     | '/student/materials'
     | '/student/noc'
     | '/student/profile'
+    | '/student/tracker'
     | '/student/vault'
     | '/student/'
   fileRoutesByTo: FileRoutesByTo
@@ -137,9 +167,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/student/announcements'
     | '/student/documents'
+    | '/student/eduai'
+    | '/student/exams'
     | '/student/materials'
     | '/student/noc'
     | '/student/profile'
+    | '/student/tracker'
     | '/student/vault'
     | '/student'
   id:
@@ -150,9 +183,12 @@ export interface FileRouteTypes {
     | '/student'
     | '/student/announcements'
     | '/student/documents'
+    | '/student/eduai'
+    | '/student/exams'
     | '/student/materials'
     | '/student/noc'
     | '/student/profile'
+    | '/student/tracker'
     | '/student/vault'
     | '/student/'
   fileRoutesById: FileRoutesById
@@ -208,6 +244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentVaultRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/student/tracker': {
+      id: '/student/tracker'
+      path: '/tracker'
+      fullPath: '/student/tracker'
+      preLoaderRoute: typeof StudentTrackerRouteImport
+      parentRoute: typeof StudentRoute
+    }
     '/student/profile': {
       id: '/student/profile'
       path: '/profile'
@@ -227,6 +270,20 @@ declare module '@tanstack/react-router' {
       path: '/materials'
       fullPath: '/student/materials'
       preLoaderRoute: typeof StudentMaterialsRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/exams': {
+      id: '/student/exams'
+      path: '/exams'
+      fullPath: '/student/exams'
+      preLoaderRoute: typeof StudentExamsRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/eduai': {
+      id: '/student/eduai'
+      path: '/eduai'
+      fullPath: '/student/eduai'
+      preLoaderRoute: typeof StudentEduaiRouteImport
       parentRoute: typeof StudentRoute
     }
     '/student/documents': {
@@ -249,9 +306,12 @@ declare module '@tanstack/react-router' {
 interface StudentRouteChildren {
   StudentAnnouncementsRoute: typeof StudentAnnouncementsRoute
   StudentDocumentsRoute: typeof StudentDocumentsRoute
+  StudentEduaiRoute: typeof StudentEduaiRoute
+  StudentExamsRoute: typeof StudentExamsRoute
   StudentMaterialsRoute: typeof StudentMaterialsRoute
   StudentNocRoute: typeof StudentNocRoute
   StudentProfileRoute: typeof StudentProfileRoute
+  StudentTrackerRoute: typeof StudentTrackerRoute
   StudentVaultRoute: typeof StudentVaultRoute
   StudentIndexRoute: typeof StudentIndexRoute
 }
@@ -259,9 +319,12 @@ interface StudentRouteChildren {
 const StudentRouteChildren: StudentRouteChildren = {
   StudentAnnouncementsRoute: StudentAnnouncementsRoute,
   StudentDocumentsRoute: StudentDocumentsRoute,
+  StudentEduaiRoute: StudentEduaiRoute,
+  StudentExamsRoute: StudentExamsRoute,
   StudentMaterialsRoute: StudentMaterialsRoute,
   StudentNocRoute: StudentNocRoute,
   StudentProfileRoute: StudentProfileRoute,
+  StudentTrackerRoute: StudentTrackerRoute,
   StudentVaultRoute: StudentVaultRoute,
   StudentIndexRoute: StudentIndexRoute,
 }

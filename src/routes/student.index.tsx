@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Calendar, CheckCircle2, TrendingUp, Sparkles, LogOut, BookOpen, ChevronRight, FileSpreadsheet, CalendarClock, ShieldCheck, ScrollText } from "lucide-react";
+import { Calendar, CheckCircle2, TrendingUp, Sparkles, LogOut, BookOpen, ChevronRight, ShieldCheck, ScrollText, BookOpenCheck, GaugeCircle } from "lucide-react";
 import { attendanceStats, markAttendance, signOut as clearLocalUser, useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { formatISTDay } from "@/lib/format";
 import { TodoWidget } from "@/components/TodoWidget";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { RouteSkeleton } from "@/components/RouteSkeleton";
+import { SyllabusButton } from "@/components/SyllabusButton";
 
 
 
@@ -81,23 +82,14 @@ function StudentDashboard() {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2.5">
-            <a
-              href="https://www.aicte-india.org/sites/default/files/Model_Curriculum/UG_FINAL.pdf"
-              target="_blank"
-              rel="noreferrer"
-              className="group relative overflow-hidden rounded-2xl gradient-primary text-primary-foreground p-3 active:scale-[0.97] transition-transform halo-glow"
-            >
-              <FileSpreadsheet className="w-5 h-5" />
-              <p className="mt-2 text-[12px] font-black leading-tight">Download Syllabus</p>
-              <p className="text-[9px] opacity-80 mt-0.5">PDF · Current semester</p>
-            </a>
+            <SyllabusButton />
             <Link
-              to="/student/materials"
+              to="/student/eduai"
               className="group relative overflow-hidden rounded-2xl glass p-3 active:scale-[0.97] transition-transform border border-primary/20"
             >
-              <CalendarClock className="w-5 h-5 text-primary" />
-              <p className="mt-2 text-[12px] font-black leading-tight">View Live Time-Table</p>
-              <p className="text-[9px] text-muted-foreground mt-0.5">Updated weekly</p>
+              <Sparkles className="w-5 h-5 text-primary" />
+              <p className="mt-2 text-[12px] font-black leading-tight">Ask EduAI</p>
+              <p className="text-[9px] text-muted-foreground mt-0.5">Personalised study tips</p>
             </Link>
           </div>
         </div>
@@ -141,6 +133,18 @@ function StudentDashboard() {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <QuickLink
+            to="/student/exams"
+            label="Exam Portal"
+            hint="PYQs & model papers"
+            icon={<BookOpenCheck className="w-5 h-5" />}
+          />
+          <QuickLink
+            to="/student/tracker"
+            label="Academic Tracker"
+            hint="Attendance & tests"
+            icon={<GaugeCircle className="w-5 h-5" />}
+          />
+          <QuickLink
             to="/student/vault"
             label="Documents Vault"
             hint="Aadhaar, ID, Marksheets"
@@ -151,18 +155,6 @@ function StudentDashboard() {
             label="NOC Requests"
             hint="Leave & event approvals"
             icon={<ScrollText className="w-5 h-5" />}
-          />
-          <QuickLink
-            to="/student/materials"
-            label="Syllabus"
-            hint="Curriculum & modules"
-            icon={<FileSpreadsheet className="w-5 h-5" />}
-          />
-          <QuickLink
-            to="/student/materials"
-            label="Time Table"
-            hint="Weekly schedule"
-            icon={<CalendarClock className="w-5 h-5" />}
           />
         </div>
       </section>
