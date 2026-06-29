@@ -300,7 +300,7 @@ function ProfilePage() {
           </div>
           <Field label="Father's Name" v={detail.father_name} onChange={(v) => update("father_name", v)} />
           <Field label="Mother's Name" v={detail.mother_name} onChange={(v) => update("mother_name", v)} />
-          <Field label="College Name" v={detail.college_name} onChange={(v) => update("college_name", v)} />
+          <CollegeSelect value={detail.college_name} onChange={(v) => update("college_name", v)} />
           <SelectField label="Blood Group" v={detail.blood_group} options={BLOOD as unknown as string[]} onChange={(v) => update("blood_group", v)} />
 
           <button
