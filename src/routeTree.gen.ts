@@ -27,7 +27,9 @@ import { Route as StudentDocumentsRouteImport } from './routes/student.documents
 import { Route as StudentAnnouncementsRouteImport } from './routes/student.announcements'
 import { Route as NetworkRegisterRouteImport } from './routes/network.register'
 import { Route as NetworkPendingRouteImport } from './routes/network.pending'
+import { Route as NetworkCampusRouteImport } from './routes/network.campus'
 import { Route as NetworkAdminRouteImport } from './routes/network.admin'
+import { Route as NetworkChatPeerIdRouteImport } from './routes/network.chat.$peerId'
 
 const StudentRoute = StudentRouteImport.update({
   id: '/student',
@@ -119,9 +121,19 @@ const NetworkPendingRoute = NetworkPendingRouteImport.update({
   path: '/pending',
   getParentRoute: () => NetworkRoute,
 } as any)
+const NetworkCampusRoute = NetworkCampusRouteImport.update({
+  id: '/campus',
+  path: '/campus',
+  getParentRoute: () => NetworkRoute,
+} as any)
 const NetworkAdminRoute = NetworkAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => NetworkRoute,
+} as any)
+const NetworkChatPeerIdRoute = NetworkChatPeerIdRouteImport.update({
+  id: '/chat/$peerId',
+  path: '/chat/$peerId',
   getParentRoute: () => NetworkRoute,
 } as any)
 
@@ -132,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/network': typeof NetworkRouteWithChildren
   '/student': typeof StudentRouteWithChildren
   '/network/admin': typeof NetworkAdminRoute
+  '/network/campus': typeof NetworkCampusRoute
   '/network/pending': typeof NetworkPendingRoute
   '/network/register': typeof NetworkRegisterRoute
   '/student/announcements': typeof StudentAnnouncementsRoute
@@ -145,12 +158,14 @@ export interface FileRoutesByFullPath {
   '/student/vault': typeof StudentVaultRoute
   '/network/': typeof NetworkIndexRoute
   '/student/': typeof StudentIndexRoute
+  '/network/chat/$peerId': typeof NetworkChatPeerIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/network/admin': typeof NetworkAdminRoute
+  '/network/campus': typeof NetworkCampusRoute
   '/network/pending': typeof NetworkPendingRoute
   '/network/register': typeof NetworkRegisterRoute
   '/student/announcements': typeof StudentAnnouncementsRoute
@@ -164,6 +179,7 @@ export interface FileRoutesByTo {
   '/student/vault': typeof StudentVaultRoute
   '/network': typeof NetworkIndexRoute
   '/student': typeof StudentIndexRoute
+  '/network/chat/$peerId': typeof NetworkChatPeerIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -173,6 +189,7 @@ export interface FileRoutesById {
   '/network': typeof NetworkRouteWithChildren
   '/student': typeof StudentRouteWithChildren
   '/network/admin': typeof NetworkAdminRoute
+  '/network/campus': typeof NetworkCampusRoute
   '/network/pending': typeof NetworkPendingRoute
   '/network/register': typeof NetworkRegisterRoute
   '/student/announcements': typeof StudentAnnouncementsRoute
@@ -186,6 +203,7 @@ export interface FileRoutesById {
   '/student/vault': typeof StudentVaultRoute
   '/network/': typeof NetworkIndexRoute
   '/student/': typeof StudentIndexRoute
+  '/network/chat/$peerId': typeof NetworkChatPeerIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -196,6 +214,7 @@ export interface FileRouteTypes {
     | '/network'
     | '/student'
     | '/network/admin'
+    | '/network/campus'
     | '/network/pending'
     | '/network/register'
     | '/student/announcements'
@@ -209,12 +228,14 @@ export interface FileRouteTypes {
     | '/student/vault'
     | '/network/'
     | '/student/'
+    | '/network/chat/$peerId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
     | '/auth'
     | '/network/admin'
+    | '/network/campus'
     | '/network/pending'
     | '/network/register'
     | '/student/announcements'
@@ -228,6 +249,7 @@ export interface FileRouteTypes {
     | '/student/vault'
     | '/network'
     | '/student'
+    | '/network/chat/$peerId'
   id:
     | '__root__'
     | '/'
@@ -236,6 +258,7 @@ export interface FileRouteTypes {
     | '/network'
     | '/student'
     | '/network/admin'
+    | '/network/campus'
     | '/network/pending'
     | '/network/register'
     | '/student/announcements'
@@ -249,6 +272,7 @@ export interface FileRouteTypes {
     | '/student/vault'
     | '/network/'
     | '/student/'
+    | '/network/chat/$peerId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -387,6 +411,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NetworkPendingRouteImport
       parentRoute: typeof NetworkRoute
     }
+    '/network/campus': {
+      id: '/network/campus'
+      path: '/campus'
+      fullPath: '/network/campus'
+      preLoaderRoute: typeof NetworkCampusRouteImport
+      parentRoute: typeof NetworkRoute
+    }
     '/network/admin': {
       id: '/network/admin'
       path: '/admin'
@@ -394,21 +425,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NetworkAdminRouteImport
       parentRoute: typeof NetworkRoute
     }
+    '/network/chat/$peerId': {
+      id: '/network/chat/$peerId'
+      path: '/chat/$peerId'
+      fullPath: '/network/chat/$peerId'
+      preLoaderRoute: typeof NetworkChatPeerIdRouteImport
+      parentRoute: typeof NetworkRoute
+    }
   }
 }
 
 interface NetworkRouteChildren {
   NetworkAdminRoute: typeof NetworkAdminRoute
+  NetworkCampusRoute: typeof NetworkCampusRoute
   NetworkPendingRoute: typeof NetworkPendingRoute
   NetworkRegisterRoute: typeof NetworkRegisterRoute
   NetworkIndexRoute: typeof NetworkIndexRoute
+  NetworkChatPeerIdRoute: typeof NetworkChatPeerIdRoute
 }
 
 const NetworkRouteChildren: NetworkRouteChildren = {
   NetworkAdminRoute: NetworkAdminRoute,
+  NetworkCampusRoute: NetworkCampusRoute,
   NetworkPendingRoute: NetworkPendingRoute,
   NetworkRegisterRoute: NetworkRegisterRoute,
   NetworkIndexRoute: NetworkIndexRoute,
+  NetworkChatPeerIdRoute: NetworkChatPeerIdRoute,
 }
 
 const NetworkRouteWithChildren =
