@@ -47,6 +47,66 @@ export type Database = {
         }
         Relationships: []
       }
+      enrollment_requests: {
+        Row: {
+          course: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          receipt_path: string | null
+          receipt_url: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          roll_number: string | null
+          section: string
+          status: string
+          university: string
+          updated_at: string
+          user_id: string
+          year: string
+        }
+        Insert: {
+          course: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          receipt_path?: string | null
+          receipt_url?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          roll_number?: string | null
+          section: string
+          status?: string
+          university: string
+          updated_at?: string
+          user_id: string
+          year: string
+        }
+        Update: {
+          course?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          receipt_path?: string | null
+          receipt_url?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          roll_number?: string | null
+          section?: string
+          status?: string
+          university?: string
+          updated_at?: string
+          user_id?: string
+          year?: string
+        }
+        Relationships: []
+      }
       learning_materials: {
         Row: {
           course: string | null
@@ -83,6 +143,63 @@ export type Database = {
           title?: string
           updated_at?: string
           uploaded_by?: string | null
+        }
+        Relationships: []
+      }
+      network_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          recipient_id: string
+          reported: boolean
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          recipient_id: string
+          reported?: boolean
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          recipient_id?: string
+          reported?: boolean
+          sender_id?: string
+        }
+        Relationships: []
+      }
+      network_teachers: {
+        Row: {
+          course: string
+          created_at: string
+          designation: string | null
+          id: string
+          name: string
+          subject: string
+          university: string
+        }
+        Insert: {
+          course: string
+          created_at?: string
+          designation?: string | null
+          id?: string
+          name: string
+          subject: string
+          university: string
+        }
+        Update: {
+          course?: string
+          created_at?: string
+          designation?: string | null
+          id?: string
+          name?: string
+          subject?: string
+          university?: string
         }
         Relationships: []
       }
