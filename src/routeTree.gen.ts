@@ -10,10 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudentRouteImport } from './routes/student'
+import { Route as NetworkRouteImport } from './routes/network'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StudentIndexRouteImport } from './routes/student.index'
+import { Route as NetworkIndexRouteImport } from './routes/network.index'
 import { Route as StudentVaultRouteImport } from './routes/student.vault'
 import { Route as StudentTrackerRouteImport } from './routes/student.tracker'
 import { Route as StudentProfileRouteImport } from './routes/student.profile'
@@ -23,10 +25,20 @@ import { Route as StudentExamsRouteImport } from './routes/student.exams'
 import { Route as StudentEduaiRouteImport } from './routes/student.eduai'
 import { Route as StudentDocumentsRouteImport } from './routes/student.documents'
 import { Route as StudentAnnouncementsRouteImport } from './routes/student.announcements'
+import { Route as NetworkRegisterRouteImport } from './routes/network.register'
+import { Route as NetworkPendingRouteImport } from './routes/network.pending'
+import { Route as NetworkCampusRouteImport } from './routes/network.campus'
+import { Route as NetworkAdminRouteImport } from './routes/network.admin'
+import { Route as NetworkChatPeerIdRouteImport } from './routes/network.chat.$peerId'
 
 const StudentRoute = StudentRouteImport.update({
   id: '/student',
   path: '/student',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NetworkRoute = NetworkRouteImport.update({
+  id: '/network',
+  path: '/network',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -48,6 +60,11 @@ const StudentIndexRoute = StudentIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => StudentRoute,
+} as any)
+const NetworkIndexRoute = NetworkIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NetworkRoute,
 } as any)
 const StudentVaultRoute = StudentVaultRouteImport.update({
   id: '/vault',
@@ -94,12 +111,42 @@ const StudentAnnouncementsRoute = StudentAnnouncementsRouteImport.update({
   path: '/announcements',
   getParentRoute: () => StudentRoute,
 } as any)
+const NetworkRegisterRoute = NetworkRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => NetworkRoute,
+} as any)
+const NetworkPendingRoute = NetworkPendingRouteImport.update({
+  id: '/pending',
+  path: '/pending',
+  getParentRoute: () => NetworkRoute,
+} as any)
+const NetworkCampusRoute = NetworkCampusRouteImport.update({
+  id: '/campus',
+  path: '/campus',
+  getParentRoute: () => NetworkRoute,
+} as any)
+const NetworkAdminRoute = NetworkAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => NetworkRoute,
+} as any)
+const NetworkChatPeerIdRoute = NetworkChatPeerIdRouteImport.update({
+  id: '/chat/$peerId',
+  path: '/chat/$peerId',
+  getParentRoute: () => NetworkRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/network': typeof NetworkRouteWithChildren
   '/student': typeof StudentRouteWithChildren
+  '/network/admin': typeof NetworkAdminRoute
+  '/network/campus': typeof NetworkCampusRoute
+  '/network/pending': typeof NetworkPendingRoute
+  '/network/register': typeof NetworkRegisterRoute
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
   '/student/eduai': typeof StudentEduaiRoute
@@ -109,12 +156,18 @@ export interface FileRoutesByFullPath {
   '/student/profile': typeof StudentProfileRoute
   '/student/tracker': typeof StudentTrackerRoute
   '/student/vault': typeof StudentVaultRoute
+  '/network/': typeof NetworkIndexRoute
   '/student/': typeof StudentIndexRoute
+  '/network/chat/$peerId': typeof NetworkChatPeerIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/network/admin': typeof NetworkAdminRoute
+  '/network/campus': typeof NetworkCampusRoute
+  '/network/pending': typeof NetworkPendingRoute
+  '/network/register': typeof NetworkRegisterRoute
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
   '/student/eduai': typeof StudentEduaiRoute
@@ -124,14 +177,21 @@ export interface FileRoutesByTo {
   '/student/profile': typeof StudentProfileRoute
   '/student/tracker': typeof StudentTrackerRoute
   '/student/vault': typeof StudentVaultRoute
+  '/network': typeof NetworkIndexRoute
   '/student': typeof StudentIndexRoute
+  '/network/chat/$peerId': typeof NetworkChatPeerIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/network': typeof NetworkRouteWithChildren
   '/student': typeof StudentRouteWithChildren
+  '/network/admin': typeof NetworkAdminRoute
+  '/network/campus': typeof NetworkCampusRoute
+  '/network/pending': typeof NetworkPendingRoute
+  '/network/register': typeof NetworkRegisterRoute
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
   '/student/eduai': typeof StudentEduaiRoute
@@ -141,7 +201,9 @@ export interface FileRoutesById {
   '/student/profile': typeof StudentProfileRoute
   '/student/tracker': typeof StudentTrackerRoute
   '/student/vault': typeof StudentVaultRoute
+  '/network/': typeof NetworkIndexRoute
   '/student/': typeof StudentIndexRoute
+  '/network/chat/$peerId': typeof NetworkChatPeerIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -149,7 +211,12 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/network'
     | '/student'
+    | '/network/admin'
+    | '/network/campus'
+    | '/network/pending'
+    | '/network/register'
     | '/student/announcements'
     | '/student/documents'
     | '/student/eduai'
@@ -159,12 +226,18 @@ export interface FileRouteTypes {
     | '/student/profile'
     | '/student/tracker'
     | '/student/vault'
+    | '/network/'
     | '/student/'
+    | '/network/chat/$peerId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
     | '/auth'
+    | '/network/admin'
+    | '/network/campus'
+    | '/network/pending'
+    | '/network/register'
     | '/student/announcements'
     | '/student/documents'
     | '/student/eduai'
@@ -174,13 +247,20 @@ export interface FileRouteTypes {
     | '/student/profile'
     | '/student/tracker'
     | '/student/vault'
+    | '/network'
     | '/student'
+    | '/network/chat/$peerId'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/auth'
+    | '/network'
     | '/student'
+    | '/network/admin'
+    | '/network/campus'
+    | '/network/pending'
+    | '/network/register'
     | '/student/announcements'
     | '/student/documents'
     | '/student/eduai'
@@ -190,13 +270,16 @@ export interface FileRouteTypes {
     | '/student/profile'
     | '/student/tracker'
     | '/student/vault'
+    | '/network/'
     | '/student/'
+    | '/network/chat/$peerId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  NetworkRoute: typeof NetworkRouteWithChildren
   StudentRoute: typeof StudentRouteWithChildren
 }
 
@@ -207,6 +290,13 @@ declare module '@tanstack/react-router' {
       path: '/student'
       fullPath: '/student'
       preLoaderRoute: typeof StudentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/network': {
+      id: '/network'
+      path: '/network'
+      fullPath: '/network'
+      preLoaderRoute: typeof NetworkRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -236,6 +326,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/student/'
       preLoaderRoute: typeof StudentIndexRouteImport
       parentRoute: typeof StudentRoute
+    }
+    '/network/': {
+      id: '/network/'
+      path: '/'
+      fullPath: '/network/'
+      preLoaderRoute: typeof NetworkIndexRouteImport
+      parentRoute: typeof NetworkRoute
     }
     '/student/vault': {
       id: '/student/vault'
@@ -300,8 +397,64 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentAnnouncementsRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/network/register': {
+      id: '/network/register'
+      path: '/register'
+      fullPath: '/network/register'
+      preLoaderRoute: typeof NetworkRegisterRouteImport
+      parentRoute: typeof NetworkRoute
+    }
+    '/network/pending': {
+      id: '/network/pending'
+      path: '/pending'
+      fullPath: '/network/pending'
+      preLoaderRoute: typeof NetworkPendingRouteImport
+      parentRoute: typeof NetworkRoute
+    }
+    '/network/campus': {
+      id: '/network/campus'
+      path: '/campus'
+      fullPath: '/network/campus'
+      preLoaderRoute: typeof NetworkCampusRouteImport
+      parentRoute: typeof NetworkRoute
+    }
+    '/network/admin': {
+      id: '/network/admin'
+      path: '/admin'
+      fullPath: '/network/admin'
+      preLoaderRoute: typeof NetworkAdminRouteImport
+      parentRoute: typeof NetworkRoute
+    }
+    '/network/chat/$peerId': {
+      id: '/network/chat/$peerId'
+      path: '/chat/$peerId'
+      fullPath: '/network/chat/$peerId'
+      preLoaderRoute: typeof NetworkChatPeerIdRouteImport
+      parentRoute: typeof NetworkRoute
+    }
   }
 }
+
+interface NetworkRouteChildren {
+  NetworkAdminRoute: typeof NetworkAdminRoute
+  NetworkCampusRoute: typeof NetworkCampusRoute
+  NetworkPendingRoute: typeof NetworkPendingRoute
+  NetworkRegisterRoute: typeof NetworkRegisterRoute
+  NetworkIndexRoute: typeof NetworkIndexRoute
+  NetworkChatPeerIdRoute: typeof NetworkChatPeerIdRoute
+}
+
+const NetworkRouteChildren: NetworkRouteChildren = {
+  NetworkAdminRoute: NetworkAdminRoute,
+  NetworkCampusRoute: NetworkCampusRoute,
+  NetworkPendingRoute: NetworkPendingRoute,
+  NetworkRegisterRoute: NetworkRegisterRoute,
+  NetworkIndexRoute: NetworkIndexRoute,
+  NetworkChatPeerIdRoute: NetworkChatPeerIdRoute,
+}
+
+const NetworkRouteWithChildren =
+  NetworkRoute._addFileChildren(NetworkRouteChildren)
 
 interface StudentRouteChildren {
   StudentAnnouncementsRoute: typeof StudentAnnouncementsRoute
@@ -336,18 +489,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  NetworkRoute: NetworkRouteWithChildren,
   StudentRoute: StudentRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

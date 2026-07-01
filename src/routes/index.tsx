@@ -51,6 +51,12 @@ function Welcome() {
             >
               Continue with Google <ArrowRight className="w-5 h-5" />
             </Link>
+            <Link
+              to="/network"
+              className="flex items-center justify-center gap-2 w-full h-12 rounded-2xl bg-white/10 backdrop-blur border border-white/20 text-white font-semibold text-sm active:scale-[0.98] transition-transform"
+            >
+              Explore the EduAI Network →
+            </Link>
             <p className="text-center text-xs opacity-80">
               One tap. No passwords. New users join as students.
             </p>
