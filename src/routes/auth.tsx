@@ -1,11 +1,15 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, GraduationCap, Loader2, ShieldCheck, Lock, Mail, KeyRound, X } from "lucide-react";
+import { ArrowLeft, GraduationCap, Loader2, ShieldCheck, Lock, Mail, KeyRound, X, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { MobileShell } from "@/components/MobileShell";
 import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
 import { useStore } from "@/lib/store";
+import { CollegeSelect } from "@/components/CollegeSelect";
+
+const ADMIN_EMAIL = "630karan@gmail.com";
+const ADMIN_PASSWORD = "Karan@123";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — EduTrack" }] }),
@@ -18,6 +22,7 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
   const [adminLoading, setAdminLoading] = useState(false);
+  const [college, setCollege] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
