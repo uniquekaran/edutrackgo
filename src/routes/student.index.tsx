@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Calendar, CheckCircle2, TrendingUp, Sparkles, LogOut, BookOpen, ChevronRight, ShieldCheck, ScrollText, BookOpenCheck, GaugeCircle } from "lucide-react";
 import { attendanceStats, markAttendance, signOut as clearLocalUser, useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
