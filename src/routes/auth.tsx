@@ -50,36 +50,40 @@ function AuthPage() {
 
   async function handleAdminLogin(e: React.FormEvent) {
     e.preventDefault();
+    if (!college) {
+      toast.error("Please select your college first.");
+      return;
+    }
     if (!email || !password) {
       toast.error("Please enter both email and password.");
       return;
     }
+    if (email.trim().toLowerCase() !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+      toast.error("Access Denied: invalid administrator credentials.");
+      return;
+    }
     setAdminLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      try { localStorage.setItem("edutrack-admin-college", college); } catch {}
+      const { data, error } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD });
       if (error || !data.user) {
         toast.error(error?.message ?? "Invalid credentials.");
         setAdminLoading(false);
         return;
       }
-
-      // Verify admin role
       const { data: roleRow } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", data.user.id)
         .eq("role", "admin")
         .maybeSingle();
-
       if (!roleRow) {
         await supabase.auth.signOut();
         toast.error("Access Denied: Administrative account required");
         setAdminLoading(false);
         return;
       }
-
-      toast.success("Welcome back, admin.");
-      // Auth listener will route via SIGNED_IN
+      toast.success(`Welcome back — ${college}`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Login failed.");
       setAdminLoading(false);
