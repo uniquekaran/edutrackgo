@@ -74,7 +74,11 @@ function StudentDashboard() {
           <div className="min-w-0">
             <p className="text-xs uppercase tracking-widest opacity-80">{formatISTDay(new Date())}</p>
             <h1 className="mt-1 text-2xl font-black truncate">Hi, {user.name?.split(" ")[0] ?? "there"} 👋</h1>
-            <p className="text-sm opacity-90 mt-0.5 truncate">{user.department ?? "Student"}</p>
+            <p className="text-sm opacity-90 mt-0.5 truncate">
+              {course ? `${course} · Student` : (
+                <Link to="/student/profile" className="underline decoration-white/40 hover:decoration-white">Set your branch →</Link>
+              )}
+            </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <ThemeToggle variant="onPrimary" />
