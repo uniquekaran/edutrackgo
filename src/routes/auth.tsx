@@ -196,6 +196,14 @@ function AuthPage() {
 
             <form onSubmit={handleAdminLogin} className="space-y-3">
               <div>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5" /> College
+                </label>
+                <div className="mt-1.5">
+                  <CollegeSelect value={college} onChange={setCollege} label="" placeholder="Select your college first…" />
+                </div>
+              </div>
+              <div>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Email</label>
                 <div className="mt-1.5 relative">
                   <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
