@@ -24,8 +24,8 @@ export const askEduAI = createServerFn({ method: "POST" })
     return data;
   })
   .handler(async ({ data }) => {
-    const key = process.env.GOOGLE_API_KEY;
-    if (!key) throw new Error("GOOGLE_API_KEY not configured");
+    const key = (data.userApiKey && data.userApiKey.trim()) || process.env.GOOGLE_API_KEY;
+    if (!key) throw new Error("Please provide a Gemini API Key to enable EduAI.");
 
     const contents: { role: "user" | "model"; parts: { text: string }[] }[] = [];
     for (const h of data.history ?? []) {
