@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Calendar, CheckCircle2, TrendingUp, Sparkles, LogOut, BookOpen, ChevronRight, ShieldCheck, ScrollText, BookOpenCheck, GaugeCircle } from "lucide-react";
 import { attendanceStats, markAttendance, signOut as clearLocalUser, useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +24,22 @@ function StudentDashboard() {
   const navigate = useNavigate();
   const user = useStore((s) => s.user)!;
   const attendance = useStore((s) => s.attendance);
+  const [course, setCourse] = useState<string>("");
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("student_profiles_detail")
+          .select("course")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (active && data?.course) setCourse(data.course);
+      } catch (e) { console.warn(e); }
+    })();
+    return () => { active = false; };
+  }, [user.id]);
 
   const stats = useMemo(() => attendanceStats(user.id), [attendance, user.id]);
   const today = new Date().toISOString().slice(0, 10);
@@ -58,7 +74,11 @@ function StudentDashboard() {
           <div className="min-w-0">
             <p className="text-xs uppercase tracking-widest opacity-80">{formatISTDay(new Date())}</p>
             <h1 className="mt-1 text-2xl font-black truncate">Hi, {user.name?.split(" ")[0] ?? "there"} 👋</h1>
-            <p className="text-sm opacity-90 mt-0.5 truncate">{user.department ?? "Student"}</p>
+            <p className="text-sm opacity-90 mt-0.5 truncate">
+              {course ? `${course} · Student` : (
+                <Link to="/student/profile" className="underline decoration-white/40 hover:decoration-white">Set your branch →</Link>
+              )}
+            </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <ThemeToggle variant="onPrimary" />

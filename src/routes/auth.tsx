@@ -1,11 +1,15 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, GraduationCap, Loader2, ShieldCheck, Lock, Mail, KeyRound, X } from "lucide-react";
+import { ArrowLeft, GraduationCap, Loader2, ShieldCheck, Lock, Mail, KeyRound, X, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { MobileShell } from "@/components/MobileShell";
 import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
 import { useStore } from "@/lib/store";
+import { CollegeSelect } from "@/components/CollegeSelect";
+
+const ADMIN_EMAIL = "630karan@gmail.com";
+const ADMIN_PASSWORD = "Karan@123";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — EduTrack" }] }),
@@ -18,6 +22,7 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [adminOpen, setAdminOpen] = useState(false);
   const [adminLoading, setAdminLoading] = useState(false);
+  const [college, setCollege] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -45,36 +50,40 @@ function AuthPage() {
 
   async function handleAdminLogin(e: React.FormEvent) {
     e.preventDefault();
+    if (!college) {
+      toast.error("Please select your college first.");
+      return;
+    }
     if (!email || !password) {
       toast.error("Please enter both email and password.");
       return;
     }
+    if (email.trim().toLowerCase() !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+      toast.error("Access Denied: invalid administrator credentials.");
+      return;
+    }
     setAdminLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      try { localStorage.setItem("edutrack-admin-college", college); } catch {}
+      const { data, error } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD });
       if (error || !data.user) {
         toast.error(error?.message ?? "Invalid credentials.");
         setAdminLoading(false);
         return;
       }
-
-      // Verify admin role
       const { data: roleRow } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", data.user.id)
         .eq("role", "admin")
         .maybeSingle();
-
       if (!roleRow) {
         await supabase.auth.signOut();
         toast.error("Access Denied: Administrative account required");
         setAdminLoading(false);
         return;
       }
-
-      toast.success("Welcome back, admin.");
-      // Auth listener will route via SIGNED_IN
+      toast.success(`Welcome back — ${college}`);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Login failed.");
       setAdminLoading(false);
@@ -186,6 +195,14 @@ function AuthPage() {
             </div>
 
             <form onSubmit={handleAdminLogin} className="space-y-3">
+              <div>
+                <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <Building2 className="w-3.5 h-3.5" /> College
+                </label>
+                <div className="mt-1.5">
+                  <CollegeSelect value={college} onChange={setCollege} label="" placeholder="Select your college first…" />
+                </div>
+              </div>
               <div>
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">Email</label>
                 <div className="mt-1.5 relative">
