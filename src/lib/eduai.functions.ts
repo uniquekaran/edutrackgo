@@ -3,6 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 interface AskInput {
   prompt: string;
   history?: { role: "user" | "model"; text: string }[];
+  userApiKey?: string;
 }
 
 const SYSTEM_PROMPT = `You are "EduAI Study Buddy", a warm, patient, expert tutor for Indian students.
