@@ -24,6 +24,22 @@ function StudentDashboard() {
   const navigate = useNavigate();
   const user = useStore((s) => s.user)!;
   const attendance = useStore((s) => s.attendance);
+  const [course, setCourse] = useState<string>("");
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("student_profiles_detail")
+          .select("course")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        if (active && data?.course) setCourse(data.course);
+      } catch (e) { console.warn(e); }
+    })();
+    return () => { active = false; };
+  }, [user.id]);
 
   const stats = useMemo(() => attendanceStats(user.id), [attendance, user.id]);
   const today = new Date().toISOString().slice(0, 10);
