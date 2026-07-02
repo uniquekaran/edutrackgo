@@ -219,6 +219,9 @@ export const COLLEGES: ReadonlyArray<string> = [
   "SASTRA University",
   "SMVD University, Katra",
   "Other",
+];
+
+
 
 // Course → simulated Google Drive PDF (AICTE/NCERT model curriculum).
 // Treated as "fetched from connected Drive folder".
