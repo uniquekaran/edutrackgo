@@ -26,6 +26,8 @@ export interface DocumentItem {
 export interface AttendanceRecord {
   userId: string;
   date: string; // YYYY-MM-DD
+  time?: string; // HH:MM:SS (24h, IST local)
+  timestamp?: number; // epoch ms
 }
 
 export interface Announcement {
