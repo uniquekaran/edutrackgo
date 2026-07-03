@@ -26,6 +26,8 @@ export interface DocumentItem {
 export interface AttendanceRecord {
   userId: string;
   date: string; // YYYY-MM-DD
+  time?: string; // HH:MM:SS (24h, IST local)
+  timestamp?: number; // epoch ms
 }
 
 export interface Announcement {
@@ -142,10 +144,13 @@ export function randomDepartment() {
 }
 
 export function markAttendance(userId: string) {
-  const today = new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const today = now.toISOString().slice(0, 10);
   const exists = state.attendance.some((a) => a.userId === userId && a.date === today);
   if (exists) return false;
-  store.set((s) => ({ ...s, attendance: [...s.attendance, { userId, date: today }] }));
+  const time = now.toLocaleTimeString("en-IN", { hour12: false, timeZone: "Asia/Kolkata" });
+  const record: AttendanceRecord = { userId, date: today, time, timestamp: now.getTime() };
+  store.set((s) => ({ ...s, attendance: [...s.attendance, record] }));
   return true;
 }
 

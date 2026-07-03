@@ -210,20 +210,27 @@ function StudentDashboard() {
           {recent.length === 0 && (
             <p className="p-5 text-sm text-muted-foreground text-center">No attendance yet. Mark today's!</p>
           )}
-          {recent.map((r) => (
-            <div key={r.date} className="flex items-center justify-between px-4 py-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-success/15 text-success grid place-items-center">
-                  <CheckCircle2 className="w-4 h-4" />
+          {recent.map((r) => {
+            const timeLabel = r.timestamp
+              ? new Date(r.timestamp).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true, timeZone: "Asia/Kolkata" })
+              : r.time ?? null;
+            return (
+              <div key={r.date} className="flex items-center justify-between px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-success/15 text-success grid place-items-center">
+                    <CheckCircle2 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">{formatDate(r.date)}</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      {timeLabel ? `Marked at ${timeLabel}` : "Present"}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold">{formatDate(r.date)}</p>
-                  <p className="text-[11px] text-muted-foreground">Present</p>
-                </div>
+                <span className="text-[11px] font-bold uppercase text-success">On time</span>
               </div>
-              <span className="text-[11px] font-bold uppercase text-success">On time</span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
