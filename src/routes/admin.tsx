@@ -1068,3 +1068,139 @@ function buildMockSnapshot(): { students: StudentRow[]; docs: DocRow[] } {
   ];
   return { students, docs };
 }
+
+/* ============================ Analytics helpers ============================ */
+
+function useAIQueriesToday() {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    function read() {
+      try {
+        const key = `eduai-queries-${new Date().toISOString().slice(0, 10)}`;
+        setCount(Number(localStorage.getItem(key) ?? 0));
+      } catch { setCount(0); }
+    }
+    read();
+    const t = setInterval(read, 4000);
+    const onStorage = (e: StorageEvent) => { if (e.key?.startsWith("eduai-queries-")) read(); };
+    window.addEventListener("storage", onStorage);
+    return () => { clearInterval(t); window.removeEventListener("storage", onStorage); };
+  }, []);
+  return count;
+}
+
+function ExtraCounters({ totalStudents, presentCount }: { totalStudents: number; presentCount: number }) {
+  const aiToday = useAIQueriesToday();
+  const presentPct = totalStudents === 0 ? 0 : Math.round((presentCount / totalStudents) * 100);
+  const absentPct = Math.max(0, 100 - presentPct);
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      <div className="rounded-2xl glass shadow-soft p-3 flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl gradient-primary text-primary-foreground grid place-items-center shrink-0">
+          <Users className="w-4 h-4" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Registered</p>
+          <p className="text-lg font-black leading-tight">{totalStudents}</p>
+        </div>
+      </div>
+      <div className="rounded-2xl glass shadow-soft p-3 flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-accent text-primary grid place-items-center shrink-0">
+          <Sparkles className="w-4 h-4" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">AI Queries today</p>
+          <p className="text-lg font-black leading-tight">{aiToday}</p>
+        </div>
+      </div>
+      <div className="col-span-2 rounded-2xl glass shadow-soft p-3">
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <TrendingUp className="w-3 h-3" /> Real-time attendance
+          </p>
+          <p className="text-[11px] font-semibold text-muted-foreground">{presentCount}/{totalStudents}</p>
+        </div>
+        <div className="mt-2 h-2.5 rounded-full bg-muted overflow-hidden flex">
+          <div className="gradient-primary" style={{ width: `${presentPct}%` }} />
+          <div className="bg-destructive/40" style={{ width: `${absentPct}%` }} />
+        </div>
+        <div className="mt-1.5 flex items-center justify-between text-[11px] font-bold">
+          <span className="text-success">Present · {presentPct}%</span>
+          <span className="text-destructive">Absent · {absentPct}%</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface FeedItem { id: string; icon: "user" | "doc" | "att" | "ann"; text: string; when: number }
+
+function LiveActivityFeed({
+  students, docs, announcements, attendance,
+}: {
+  students: StudentRow[];
+  docs: DocRow[];
+  announcements: { id: string; title: string; createdAt: number; authorName: string }[];
+  attendance: AttendanceRecord[];
+}) {
+  const items: FeedItem[] = useMemo(() => {
+    const list: FeedItem[] = [];
+    for (const s of students) {
+      list.push({
+        id: `s-${s.id}`,
+        icon: "user",
+        text: `New student registered — ${s.full_name ?? s.email}`,
+        when: new Date(s.created_at).getTime(),
+      });
+    }
+    for (const d of docs) {
+      list.push({
+        id: `d-${d.id}`,
+        icon: "doc",
+        text: `${d.student_name} · ${d.document_type} → ${d.status}`,
+        when: new Date(d.created_at).getTime(),
+      });
+    }
+    for (const a of attendance) {
+      const s = students.find((x) => x.id === a.userId);
+      const name = s?.full_name ?? a.userId.slice(0, 8);
+      const when = a.timestamp ?? new Date(a.date).getTime();
+      list.push({ id: `a-${a.userId}-${a.date}`, icon: "att", text: `${name} marked attendance`, when });
+    }
+    for (const ann of announcements) {
+      list.push({ id: `n-${ann.id}`, icon: "ann", text: `Announcement · ${ann.title}`, when: ann.createdAt });
+    }
+    return list.sort((a, b) => b.when - a.when).slice(0, 12);
+  }, [students, docs, attendance, announcements]);
+
+  return (
+    <section>
+      <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+        <Radio className="w-3.5 h-3.5 text-primary animate-pulse" /> Live activity feed
+      </h2>
+      <div className="rounded-2xl glass shadow-soft divide-y divide-border overflow-hidden">
+        {items.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-6">No recent activity.</p>
+        ) : items.map((it) => (
+          <div key={it.id} className="flex items-center gap-3 px-4 py-2.5">
+            <div className={`w-8 h-8 rounded-lg grid place-items-center shrink-0 ${
+              it.icon === "user" ? "bg-accent text-primary"
+              : it.icon === "doc" ? "bg-primary/15 text-primary"
+              : it.icon === "att" ? "bg-success/15 text-success"
+              : "bg-destructive/15 text-destructive"
+            }`}>
+              {it.icon === "user" ? <Users className="w-3.5 h-3.5" />
+                : it.icon === "doc" ? <FileText className="w-3.5 h-3.5" />
+                : it.icon === "att" ? <CalendarCheck className="w-3.5 h-3.5" />
+                : <Megaphone className="w-3.5 h-3.5" />}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-semibold truncate">{it.text}</p>
+              <p className="text-[10px] text-muted-foreground">{formatISTDateTime(it.when)}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
