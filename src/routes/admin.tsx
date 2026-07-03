@@ -616,6 +616,8 @@ function Analytics({
         <MetricCard label="Present" value={presentToday.length} icon={<CalendarCheck className="w-4 h-4" />} />
       </div>
 
+      <ExtraCounters totalStudents={students.length} presentCount={presentToday.length} />
+
       <section>
         <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
           <Activity className="w-3.5 h-3.5" /> Student activity · last 7 days
@@ -631,43 +633,20 @@ function Analytics({
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                <XAxis
-                  dataKey="label"
-                  tick={{ fontSize: 10, fill: "var(--color-muted-foreground)" }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  allowDecimals={false}
-                  tick={{ fontSize: 10, fill: "var(--color-muted-foreground)" }}
-                  axisLine={false}
-                  tickLine={false}
-                  width={28}
-                />
+                <XAxis dataKey="label" tick={{ fontSize: 10, fill: "var(--color-muted-foreground)" }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: "var(--color-muted-foreground)" }} axisLine={false} tickLine={false} width={28} />
                 <Tooltip
                   cursor={{ stroke: "var(--color-primary)", strokeOpacity: 0.2 }}
-                  contentStyle={{
-                    background: "var(--color-surface)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: 12,
-                    fontSize: 12,
-                  }}
+                  contentStyle={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 12, fontSize: 12 }}
                   labelStyle={{ fontWeight: 700 }}
                   formatter={(v: number) => [`${v} check-ins`, "Activity"]}
                 />
-                <Line
-                  type="monotone"
-                  dataKey="count"
-                  stroke="url(#actGrad)"
-                  strokeWidth={3}
-                  dot={{ r: 3, fill: "var(--color-primary)", strokeWidth: 0 }}
-                  activeDot={{ r: 5 }}
-                />
+                <Line type="monotone" dataKey="count" stroke="url(#actGrad)" strokeWidth={3} dot={{ r: 3, fill: "var(--color-primary)", strokeWidth: 0 }} activeDot={{ r: 5 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
           <p className="text-[10px] text-muted-foreground text-center mt-1">
-            Live check-ins synced from the attendance store.
+            Peak check-in intervals · last 7 days
           </p>
         </div>
       </section>
@@ -676,30 +655,40 @@ function Analytics({
         <h2 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-2">
           Live attendance · today
         </h2>
-        <div className="rounded-2xl glass shadow-soft p-4">
+        <div className="rounded-2xl glass shadow-soft divide-y divide-border overflow-hidden">
           {presentToday.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-4">
+            <p className="text-sm text-muted-foreground text-center py-6">
               No check-ins recorded yet today.
             </p>
           ) : (
-            <div className="grid grid-cols-4 gap-2">
-              {presentToday.map((a) => {
+            [...presentToday]
+              .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))
+              .map((a) => {
                 const s = students.find((x) => x.id === a.userId);
-                const label = s?.full_name ?? a.userId.slice(0, 6);
+                const label = s?.full_name ?? a.userId.slice(0, 8);
                 const initials = label.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase();
+                const timeLabel = a.timestamp
+                  ? new Date(a.timestamp).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true, timeZone: "Asia/Kolkata" })
+                  : (a.time ?? "—");
                 return (
-                  <div key={a.userId} className="flex flex-col items-center gap-1">
-                    <div className="w-10 h-10 rounded-xl gradient-primary text-primary-foreground grid place-items-center text-xs font-black">
+                  <div key={a.userId} className="flex items-center gap-3 px-4 py-2.5">
+                    <div className="w-9 h-9 rounded-xl gradient-primary text-primary-foreground grid place-items-center text-[11px] font-black shrink-0">
                       {initials || "?"}
                     </div>
-                    <p className="text-[10px] text-center truncate w-full">{label}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold truncate">{label}</p>
+                      <p className="text-[11px] text-muted-foreground">Marked at {timeLabel}</p>
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-success">Present</span>
                   </div>
                 );
-              })}
-            </div>
+              })
           )}
         </div>
       </section>
+
+      <LiveActivityFeed students={students} docs={docs} announcements={announcements} attendance={attendance} />
+
 
       <div className="rounded-2xl glass shadow-soft p-4">
         <h2 className="text-base font-bold flex items-center gap-2">
