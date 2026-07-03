@@ -218,6 +218,8 @@ export const COLLEGES: ReadonlyArray<string> = [
   "KIIT University, Bhubaneswar",
   "SASTRA University",
   "SMVD University, Katra",
+  "Dr. M.C. Saxena Group of Colleges, Lucknow",
+  "VGI (Vishveshwarya Group of Institutions), Greater Noida",
   "Other",
 ];
 
