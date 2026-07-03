@@ -1,19 +1,21 @@
 import { useEffect, useRef, useState } from "react";
-import { Sparkles, Send, X, Bot, User as UserIcon, Settings, KeyRound, Check } from "lucide-react";
+import { Sparkles, Send, X, Bot, User as UserIcon } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { askEduAI } from "@/lib/eduai.functions";
 import ReactMarkdown from "react-markdown";
-import { toast } from "sonner";
 
 interface Msg { id: string; role: "user" | "model"; text: string }
 
-const KEY_STORAGE = "edutrack-gemini-key";
+function bumpAiCounter() {
+  try {
+    const key = `eduai-queries-${new Date().toISOString().slice(0, 10)}`;
+    const next = Number(localStorage.getItem(key) ?? 0) + 1;
+    localStorage.setItem(key, String(next));
+  } catch {}
+}
 
 export function StudyBuddy() {
   const [open, setOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [userKey, setUserKey] = useState<string>("");
-  const [keyInput, setKeyInput] = useState<string>("");
   const [messages, setMessages] = useState<Msg[]>([
     { id: "w", role: "model", text: "Namaste! 👋 I'm your **EduAI Study Buddy**. Ask me anything — UP Board, NDA prep, or B.Tech / B.Sc / B.A syllabus doubts." },
   ]);
@@ -22,22 +24,7 @@ export function StudyBuddy() {
   const endRef = useRef<HTMLDivElement>(null);
   const ask = useServerFn(askEduAI);
 
-  useEffect(() => {
-    try {
-      const k = localStorage.getItem(KEY_STORAGE) ?? "";
-      setUserKey(k); setKeyInput(k);
-    } catch {}
-  }, []);
-
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading, open]);
-
-  function saveKey() {
-    const v = keyInput.trim();
-    try { localStorage.setItem(KEY_STORAGE, v); } catch {}
-    setUserKey(v);
-    setSettingsOpen(false);
-    toast.success(v ? "Gemini API key saved" : "API key cleared");
-  }
 
   async function send(prompt?: string) {
     const value = (prompt ?? text).trim();
@@ -48,11 +35,12 @@ export function StudyBuddy() {
     setText("");
     setLoading(true);
     try {
-      const res = await ask({ data: { prompt: value, history, userApiKey: userKey || undefined } });
+      const res = await ask({ data: { prompt: value, history } });
+      bumpAiCounter();
       setMessages((m) => [...m, { id: crypto.randomUUID(), role: "model", text: res.text }]);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Sorry — I couldn't reach the AI right now. Please try again.";
-      setMessages((m) => [...m, { id: crypto.randomUUID(), role: "model", text: msg.includes("Gemini API Key") ? "🔑 **Please provide a Gemini API Key** to enable EduAI. Tap the ⚙️ icon at the top-right to paste your key." : msg }]);
+      setMessages((m) => [...m, { id: crypto.randomUUID(), role: "model", text: msg }]);
     } finally {
       setLoading(false);
     }
@@ -82,50 +70,12 @@ export function StudyBuddy() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-black">EduAI Study Buddy</p>
-              <p className="text-[11px] opacity-80 truncate">
-                {userKey ? "Using your Gemini key" : "No key set — tap ⚙️"}
-              </p>
+              <p className="text-[11px] opacity-80 truncate">Powered by Gemini · always on</p>
             </div>
-            <button onClick={() => setSettingsOpen((v) => !v)} title="Settings"
-              className="w-8 h-8 rounded-lg bg-white/10 grid place-items-center hover:bg-white/20 transition">
-              <Settings className="w-4 h-4" />
-            </button>
             <button onClick={() => setOpen(false)} className="w-8 h-8 rounded-lg bg-white/10 grid place-items-center hover:bg-white/20 transition">
               <X className="w-4 h-4" />
             </button>
           </header>
-
-          {settingsOpen && (
-            <div className="px-4 py-3 border-b border-white/10 bg-white/[0.03] space-y-2">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-white/60 flex items-center gap-1.5">
-                <KeyRound className="w-3 h-3" /> Gemini API Key
-              </p>
-              <p className="text-[11px] text-white/60 leading-relaxed">
-                Get a free key at <span className="underline">aistudio.google.com/apikey</span>. Stored only on this device.
-              </p>
-              <div className="flex gap-2">
-                <input
-                  value={keyInput}
-                  onChange={(e) => setKeyInput(e.target.value)}
-                  placeholder="AIza…"
-                  type="password"
-                  className="flex-1 h-10 px-3 rounded-xl bg-white/5 border border-white/10 text-xs placeholder:text-white/30 outline-none focus:border-indigo-400"
-                />
-                <button onClick={saveKey}
-                  className="h-10 px-3 rounded-xl bg-gradient-to-br from-indigo-500 to-fuchsia-600 text-xs font-bold flex items-center gap-1.5 active:scale-95">
-                  <Check className="w-3.5 h-3.5" /> Save
-                </button>
-              </div>
-              {userKey && (
-                <button
-                  onClick={() => { setKeyInput(""); setUserKey(""); try { localStorage.removeItem(KEY_STORAGE); } catch {} toast.info("Key cleared"); }}
-                  className="text-[10px] text-white/50 underline hover:text-white/80"
-                >
-                  Clear saved key
-                </button>
-              )}
-            </div>
-          )}
 
           <div className="flex-1 overflow-y-auto px-3 py-4 space-y-3">
             {messages.map((m) => (
