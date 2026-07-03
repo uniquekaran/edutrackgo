@@ -18,23 +18,25 @@ interface Paper {
   url: string;
 }
 
-// Simulated Google Drive folder index — each link is a real public PDF.
+// All syllabus/PYQ links route to the official AKTU syllabus portal to avoid 404s.
+const AKTU_SYLLABUS = "https://aktu.ac.in/syllabus.html";
+
 const PAPERS: Paper[] = [
-  { title: "Engineering Mathematics — End Sem", year: 2024, subject: "Mathematics", stream: "B.Tech", url: "https://www.aicte-india.org/sites/default/files/Model_Curriculum/UG_FINAL.pdf" },
-  { title: "Data Structures & Algorithms", year: 2024, subject: "Computer Science", stream: "B.Tech", url: "https://www.aicte-india.org/sites/default/files/Model_Curriculum/UG_FINAL.pdf" },
-  { title: "Operating Systems Mid-Term", year: 2023, subject: "Computer Science", stream: "B.Tech", url: "https://www.aicte-india.org/sites/default/files/Model_Curriculum/UG_FINAL.pdf" },
-  { title: "Digital Electronics", year: 2023, subject: "Electronics", stream: "B.Tech", url: "https://www.aicte-india.org/sites/default/files/Model_Curriculum/UG_FINAL.pdf" },
-  { title: "Database Management Systems", year: 2024, subject: "Computer Science", stream: "BCA", url: "https://www.aicte-india.org/sites/default/files/Model_Curriculum/UG_FINAL.pdf" },
-  { title: "Financial Accounting", year: 2024, subject: "Commerce", stream: "B.Com", url: "https://www.ugc.gov.in/oldpdf/cbcs/B.Com-Model-Curriculum.pdf" },
-  { title: "Microeconomics", year: 2023, subject: "Economics", stream: "BA", url: "https://www.ugc.gov.in/oldpdf/cbcs/B.A.-Model-Curriculum.pdf" },
-  { title: "Organic Chemistry", year: 2024, subject: "Chemistry", stream: "B.Sc", url: "https://www.ugc.gov.in/oldpdf/cbcs/B.Sc-Model-Curriculum.pdf" },
-  { title: "Pharmaceutical Analysis", year: 2024, subject: "Pharma", stream: "B.Pharma", url: "https://www.pci.nic.in/pdf/B.Pharm_Syllabus.pdf" },
-  { title: "Workshop Practice (Polytechnic)", year: 2023, subject: "Mechanical", stream: "Poly", url: "https://www.aicte-india.org/sites/default/files/Model_Curriculum/Diploma_FINAL.pdf" },
+  { title: "Engineering Mathematics — End Sem", year: 2024, subject: "Mathematics", stream: "B.Tech", url: AKTU_SYLLABUS },
+  { title: "Data Structures & Algorithms", year: 2024, subject: "Computer Science", stream: "B.Tech", url: AKTU_SYLLABUS },
+  { title: "Operating Systems Mid-Term", year: 2023, subject: "Computer Science", stream: "B.Tech", url: AKTU_SYLLABUS },
+  { title: "Digital Electronics", year: 2023, subject: "Electronics", stream: "B.Tech", url: AKTU_SYLLABUS },
+  { title: "Database Management Systems", year: 2024, subject: "Computer Science", stream: "BCA", url: AKTU_SYLLABUS },
+  { title: "Financial Accounting", year: 2024, subject: "Commerce", stream: "B.Com", url: AKTU_SYLLABUS },
+  { title: "Microeconomics", year: 2023, subject: "Economics", stream: "BA", url: AKTU_SYLLABUS },
+  { title: "Organic Chemistry", year: 2024, subject: "Chemistry", stream: "B.Sc", url: AKTU_SYLLABUS },
+  { title: "Pharmaceutical Analysis", year: 2024, subject: "Pharma", stream: "B.Pharma", url: AKTU_SYLLABUS },
+  { title: "Workshop Practice (Polytechnic)", year: 2023, subject: "Mechanical", stream: "Poly", url: AKTU_SYLLABUS },
 ];
 
 const PATTERNS = [
+  { title: "AKTU Official Syllabus Repository", url: AKTU_SYLLABUS },
   { title: "CBSE Class 12 — Latest Pattern 2025", url: "https://cbseacademic.nic.in/curriculum_2025.html" },
-  { title: "AICTE Model Curriculum (UG)", url: "https://www.aicte-india.org/sites/default/files/Model_Curriculum/UG_FINAL.pdf" },
   { title: "UGC CBCS Framework", url: "https://www.ugc.gov.in/oldpdf/cbcs/B.Sc-Model-Curriculum.pdf" },
 ];
 
