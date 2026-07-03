@@ -4,8 +4,10 @@ import {
   Users, ShieldCheck, Megaphone, LogOut, CheckCircle2, XCircle, Send,
   FileText, Search, ChevronRight, X, Loader2, BarChart3,
   CalendarCheck, AlertTriangle, BookOpen, Upload, Trash2, Activity,
+  Sparkles, TrendingUp, Radio,
 } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import type { AttendanceRecord } from "@/lib/store";
 
 import { MobileShell } from "@/components/MobileShell";
 import { ThemeToggle } from "@/components/ThemeToggle";
