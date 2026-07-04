@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GraduationCap, ShieldCheck, ArrowRight, Sparkles, Users } from "lucide-react";
+import { GraduationCap, ShieldCheck, ArrowRight, Sparkles, Users, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/network/")({
   head: () => ({
@@ -24,6 +24,15 @@ function NetworkLanding() {
       <div className="relative z-10 min-h-screen flex flex-col md:grid md:grid-cols-2">
         {/* Left: brand */}
         <section className="p-8 md:p-14 flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-3">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-xs font-semibold px-3 py-2 rounded-xl bg-white/10 border border-white/15 backdrop-blur hover:bg-white/15 transition"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to Home
+            </Link>
+          </div>
+
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 grid place-items-center">
               <Sparkles className="w-5 h-5" />
