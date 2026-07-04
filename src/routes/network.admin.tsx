@@ -38,7 +38,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (college !== "AKTU") { toast.error("Please select your college."); return; }
     if (email.trim().toLowerCase() !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
@@ -46,11 +46,16 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
       return;
     }
     setBusy(true);
-    setTimeout(() => {
-      try { localStorage.setItem(AUTH_KEY, "1"); } catch {}
-      toast.success(`Welcome back — ${college}`);
-      onSuccess();
-    }, 400);
+    // Sign into Supabase as admin too, so RLS-protected uploads (learning_materials, storage) succeed.
+    try {
+      await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD });
+    } catch (err) {
+      console.warn("Supabase admin sign-in failed; syllabus uploads may be restricted.", err);
+    }
+    try { localStorage.setItem(AUTH_KEY, "1"); } catch {}
+    toast.success(`Welcome back — ${college}`);
+    setBusy(false);
+    onSuccess();
   }
 
   return (
