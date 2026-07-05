@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GraduationCap, ShieldCheck, ArrowRight, Sparkles, Users, ArrowLeft } from "lucide-react";
+import { GraduationCap, ShieldCheck, ArrowRight, Sparkles, Users, ArrowLeft, BookOpen } from "lucide-react";
 
 export const Route = createFileRoute("/network/")({
   head: () => ({
