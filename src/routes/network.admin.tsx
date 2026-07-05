@@ -27,7 +27,11 @@ function AdminGate() {
   }, []);
   if (authed === null) return null;
   if (!authed) return <AdminLogin onSuccess={() => setAuthed(true)} />;
-  return <AdminConsole onSignOut={() => { try { localStorage.removeItem(AUTH_KEY); } catch {}; setAuthed(false); }} />;
+  return <AdminConsole onSignOut={async () => {
+    try { localStorage.removeItem(AUTH_KEY); } catch {}
+    try { await supabase.auth.signOut(); } catch {}
+    setAuthed(false);
+  }} />;
 }
 
 /* --------------------------------- Login --------------------------------- */
