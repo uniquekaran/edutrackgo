@@ -1,15 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft, Check, X, Eye, ShieldCheck, Search, Inbox, Lock, Building2, Mail, KeyRound,
-  Loader2, Users, ClipboardList, Megaphone, BarChart3, BookOpen, Upload, FileText, CalendarClock, Send, Trash2,
+  Loader2, Users, ClipboardList, Megaphone, BarChart3, CalendarClock, Send,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNetStore, approveRequest, rejectRequest, type EnrollmentRequest } from "@/lib/network-state";
 import { useLeaves, approveLeave, rejectLeave } from "@/lib/leave-state";
 import { supabase } from "@/integrations/supabase/client";
-import { SYLLABUS_SUBJECTS, SYLLABUS_MODULE_TAG } from "@/lib/syllabus-subjects";
-import { formatISTDate } from "@/lib/format";
 
 export const Route = createFileRoute("/network/admin")({
   head: () => ({ meta: [{ title: "Admin Console — EduAI Network" }] }),
