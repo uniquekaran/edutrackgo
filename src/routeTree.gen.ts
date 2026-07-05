@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudentRouteImport } from './routes/student'
 import { Route as NetworkRouteImport } from './routes/network'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -29,7 +30,10 @@ import { Route as NetworkRegisterRouteImport } from './routes/network.register'
 import { Route as NetworkPendingRouteImport } from './routes/network.pending'
 import { Route as NetworkCampusRouteImport } from './routes/network.campus'
 import { Route as NetworkAdminRouteImport } from './routes/network.admin'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as NetworkChatPeerIdRouteImport } from './routes/network.chat.$peerId'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 
 const StudentRoute = StudentRouteImport.update({
   id: '/student',
@@ -39,6 +43,11 @@ const StudentRoute = StudentRouteImport.update({
 const NetworkRoute = NetworkRouteImport.update({
   id: '/network',
   path: '/network',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -131,18 +140,39 @@ const NetworkAdminRoute = NetworkAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => NetworkRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const NetworkChatPeerIdRoute = NetworkChatPeerIdRouteImport.update({
   id: '/chat/$peerId',
   path: '/chat/$peerId',
   getParentRoute: () => NetworkRoute,
 } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/mcp': typeof McpRoute
   '/network': typeof NetworkRouteWithChildren
   '/student': typeof StudentRouteWithChildren
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/network/admin': typeof NetworkAdminRoute
   '/network/campus': typeof NetworkCampusRoute
   '/network/pending': typeof NetworkPendingRoute
@@ -158,12 +188,16 @@ export interface FileRoutesByFullPath {
   '/student/vault': typeof StudentVaultRoute
   '/network/': typeof NetworkIndexRoute
   '/student/': typeof StudentIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/network/chat/$peerId': typeof NetworkChatPeerIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/mcp': typeof McpRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/network/admin': typeof NetworkAdminRoute
   '/network/campus': typeof NetworkCampusRoute
   '/network/pending': typeof NetworkPendingRoute
@@ -179,6 +213,7 @@ export interface FileRoutesByTo {
   '/student/vault': typeof StudentVaultRoute
   '/network': typeof NetworkIndexRoute
   '/student': typeof StudentIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/network/chat/$peerId': typeof NetworkChatPeerIdRoute
 }
 export interface FileRoutesById {
@@ -186,8 +221,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/mcp': typeof McpRoute
   '/network': typeof NetworkRouteWithChildren
   '/student': typeof StudentRouteWithChildren
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/network/admin': typeof NetworkAdminRoute
   '/network/campus': typeof NetworkCampusRoute
   '/network/pending': typeof NetworkPendingRoute
@@ -203,6 +241,7 @@ export interface FileRoutesById {
   '/student/vault': typeof StudentVaultRoute
   '/network/': typeof NetworkIndexRoute
   '/student/': typeof StudentIndexRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/network/chat/$peerId': typeof NetworkChatPeerIdRoute
 }
 export interface FileRouteTypes {
@@ -211,8 +250,11 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/mcp'
     | '/network'
     | '/student'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/network/admin'
     | '/network/campus'
     | '/network/pending'
@@ -228,12 +270,16 @@ export interface FileRouteTypes {
     | '/student/vault'
     | '/network/'
     | '/student/'
+    | '/.mcp/invoke-tool/$tool'
     | '/network/chat/$peerId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/admin'
     | '/auth'
+    | '/mcp'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/network/admin'
     | '/network/campus'
     | '/network/pending'
@@ -249,14 +295,18 @@ export interface FileRouteTypes {
     | '/student/vault'
     | '/network'
     | '/student'
+    | '/.mcp/invoke-tool/$tool'
     | '/network/chat/$peerId'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/auth'
+    | '/mcp'
     | '/network'
     | '/student'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/network/admin'
     | '/network/campus'
     | '/network/pending'
@@ -272,6 +322,7 @@ export interface FileRouteTypes {
     | '/student/vault'
     | '/network/'
     | '/student/'
+    | '/.mcp/invoke-tool/$tool'
     | '/network/chat/$peerId'
   fileRoutesById: FileRoutesById
 }
@@ -279,8 +330,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  McpRoute: typeof McpRoute
   NetworkRoute: typeof NetworkRouteWithChildren
   StudentRoute: typeof StudentRouteWithChildren
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -297,6 +352,13 @@ declare module '@tanstack/react-router' {
       path: '/network'
       fullPath: '/network'
       preLoaderRoute: typeof NetworkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -425,12 +487,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NetworkAdminRouteImport
       parentRoute: typeof NetworkRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/network/chat/$peerId': {
       id: '/network/chat/$peerId'
       path: '/chat/$peerId'
       fullPath: '/network/chat/$peerId'
       preLoaderRoute: typeof NetworkChatPeerIdRouteImport
       parentRoute: typeof NetworkRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -489,8 +572,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  McpRoute: McpRoute,
   NetworkRoute: NetworkRouteWithChildren,
   StudentRoute: StudentRouteWithChildren,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
