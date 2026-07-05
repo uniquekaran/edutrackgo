@@ -137,7 +137,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
 
 /* -------------------------------- Console -------------------------------- */
 
-type Tab = "enrollments" | "broadcast" | "leave" | "analytics" | "syllabus";
+type Tab = "enrollments" | "broadcast" | "leave" | "analytics";
 
 function AdminConsole({ onSignOut }: { onSignOut: () => void }) {
   const [tab, setTab] = useState<Tab>("enrollments");
