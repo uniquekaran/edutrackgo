@@ -26,6 +26,7 @@ import { Route as StudentExamsRouteImport } from './routes/student.exams'
 import { Route as StudentEduaiRouteImport } from './routes/student.eduai'
 import { Route as StudentDocumentsRouteImport } from './routes/student.documents'
 import { Route as StudentAnnouncementsRouteImport } from './routes/student.announcements'
+import { Route as NetworkTeacherRouteImport } from './routes/network.teacher'
 import { Route as NetworkRegisterRouteImport } from './routes/network.register'
 import { Route as NetworkPendingRouteImport } from './routes/network.pending'
 import { Route as NetworkCampusRouteImport } from './routes/network.campus'
@@ -120,6 +121,11 @@ const StudentAnnouncementsRoute = StudentAnnouncementsRouteImport.update({
   path: '/announcements',
   getParentRoute: () => StudentRoute,
 } as any)
+const NetworkTeacherRoute = NetworkTeacherRouteImport.update({
+  id: '/teacher',
+  path: '/teacher',
+  getParentRoute: () => NetworkRoute,
+} as any)
 const NetworkRegisterRoute = NetworkRegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/network/campus': typeof NetworkCampusRoute
   '/network/pending': typeof NetworkPendingRoute
   '/network/register': typeof NetworkRegisterRoute
+  '/network/teacher': typeof NetworkTeacherRoute
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
   '/student/eduai': typeof StudentEduaiRoute
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/network/campus': typeof NetworkCampusRoute
   '/network/pending': typeof NetworkPendingRoute
   '/network/register': typeof NetworkRegisterRoute
+  '/network/teacher': typeof NetworkTeacherRoute
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
   '/student/eduai': typeof StudentEduaiRoute
@@ -230,6 +238,7 @@ export interface FileRoutesById {
   '/network/campus': typeof NetworkCampusRoute
   '/network/pending': typeof NetworkPendingRoute
   '/network/register': typeof NetworkRegisterRoute
+  '/network/teacher': typeof NetworkTeacherRoute
   '/student/announcements': typeof StudentAnnouncementsRoute
   '/student/documents': typeof StudentDocumentsRoute
   '/student/eduai': typeof StudentEduaiRoute
@@ -259,6 +268,7 @@ export interface FileRouteTypes {
     | '/network/campus'
     | '/network/pending'
     | '/network/register'
+    | '/network/teacher'
     | '/student/announcements'
     | '/student/documents'
     | '/student/eduai'
@@ -284,6 +294,7 @@ export interface FileRouteTypes {
     | '/network/campus'
     | '/network/pending'
     | '/network/register'
+    | '/network/teacher'
     | '/student/announcements'
     | '/student/documents'
     | '/student/eduai'
@@ -311,6 +322,7 @@ export interface FileRouteTypes {
     | '/network/campus'
     | '/network/pending'
     | '/network/register'
+    | '/network/teacher'
     | '/student/announcements'
     | '/student/documents'
     | '/student/eduai'
@@ -459,6 +471,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentAnnouncementsRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/network/teacher': {
+      id: '/network/teacher'
+      path: '/teacher'
+      fullPath: '/network/teacher'
+      preLoaderRoute: typeof NetworkTeacherRouteImport
+      parentRoute: typeof NetworkRoute
+    }
     '/network/register': {
       id: '/network/register'
       path: '/register'
@@ -523,6 +542,7 @@ interface NetworkRouteChildren {
   NetworkCampusRoute: typeof NetworkCampusRoute
   NetworkPendingRoute: typeof NetworkPendingRoute
   NetworkRegisterRoute: typeof NetworkRegisterRoute
+  NetworkTeacherRoute: typeof NetworkTeacherRoute
   NetworkIndexRoute: typeof NetworkIndexRoute
   NetworkChatPeerIdRoute: typeof NetworkChatPeerIdRoute
 }
@@ -532,6 +552,7 @@ const NetworkRouteChildren: NetworkRouteChildren = {
   NetworkCampusRoute: NetworkCampusRoute,
   NetworkPendingRoute: NetworkPendingRoute,
   NetworkRegisterRoute: NetworkRegisterRoute,
+  NetworkTeacherRoute: NetworkTeacherRoute,
   NetworkIndexRoute: NetworkIndexRoute,
   NetworkChatPeerIdRoute: NetworkChatPeerIdRoute,
 }
