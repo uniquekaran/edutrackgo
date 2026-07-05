@@ -77,6 +77,14 @@ function NetworkLanding() {
               gradient="from-indigo-500 to-blue-600"
             />
             <PortalCard
+              to="/network/teacher"
+              icon={<BookOpen className="w-6 h-6" />}
+              tag="Teacher · Faculty"
+              title="Upload syllabus & PYQs"
+              body="Publish PDFs by subject. Students see the download instantly in their Exam Portal — no admin overlap."
+              gradient="from-emerald-500 to-cyan-500"
+            />
+            <PortalCard
               to="/network/admin"
               icon={<ShieldCheck className="w-6 h-6" />}
               tag="Admin · Clerk"
