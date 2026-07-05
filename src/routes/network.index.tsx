@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GraduationCap, ShieldCheck, ArrowRight, Sparkles, Users, ArrowLeft } from "lucide-react";
+import { GraduationCap, ShieldCheck, ArrowRight, Sparkles, Users, ArrowLeft, BookOpen } from "lucide-react";
 
 export const Route = createFileRoute("/network/")({
   head: () => ({
@@ -75,6 +75,14 @@ function NetworkLanding() {
               title="Apply to join your campus"
               body="Pick your university, course, year & section. Upload your admission fee receipt to get verified by your college."
               gradient="from-indigo-500 to-blue-600"
+            />
+            <PortalCard
+              to="/network/teacher"
+              icon={<BookOpen className="w-6 h-6" />}
+              tag="Teacher · Faculty"
+              title="Upload syllabus & PYQs"
+              body="Publish PDFs by subject. Students see the download instantly in their Exam Portal — no admin overlap."
+              gradient="from-emerald-500 to-cyan-500"
             />
             <PortalCard
               to="/network/admin"

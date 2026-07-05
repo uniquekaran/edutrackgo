@@ -1,15 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft, Check, X, Eye, ShieldCheck, Search, Inbox, Lock, Building2, Mail, KeyRound,
-  Loader2, Users, ClipboardList, Megaphone, BarChart3, BookOpen, Upload, FileText, CalendarClock, Send, Trash2,
+  Loader2, Users, ClipboardList, Megaphone, BarChart3, CalendarClock, Send,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNetStore, approveRequest, rejectRequest, type EnrollmentRequest } from "@/lib/network-state";
 import { useLeaves, approveLeave, rejectLeave } from "@/lib/leave-state";
 import { supabase } from "@/integrations/supabase/client";
-import { SYLLABUS_SUBJECTS, SYLLABUS_MODULE_TAG } from "@/lib/syllabus-subjects";
-import { formatISTDate } from "@/lib/format";
 
 export const Route = createFileRoute("/network/admin")({
   head: () => ({ meta: [{ title: "Admin Console — EduAI Network" }] }),
@@ -27,7 +25,11 @@ function AdminGate() {
   }, []);
   if (authed === null) return null;
   if (!authed) return <AdminLogin onSuccess={() => setAuthed(true)} />;
-  return <AdminConsole onSignOut={() => { try { localStorage.removeItem(AUTH_KEY); } catch {}; setAuthed(false); }} />;
+  return <AdminConsole onSignOut={async () => {
+    try { localStorage.removeItem(AUTH_KEY); } catch {}
+    try { await supabase.auth.signOut(); } catch {}
+    setAuthed(false);
+  }} />;
 }
 
 /* --------------------------------- Login --------------------------------- */
@@ -46,11 +48,13 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
       return;
     }
     setBusy(true);
-    // Sign into Supabase as admin too, so RLS-protected uploads (learning_materials, storage) succeed.
+    // Clean any prior Supabase session (prevents teacher↔admin bleeding).
+    try { await supabase.auth.signOut(); } catch {}
+    // Sign into Supabase as admin so RLS-protected reviews and writes succeed.
     try {
       await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD });
     } catch (err) {
-      console.warn("Supabase admin sign-in failed; syllabus uploads may be restricted.", err);
+      console.warn("Supabase admin sign-in failed; some writes may be restricted.", err);
     }
     try { localStorage.setItem(AUTH_KEY, "1"); } catch {}
     toast.success(`Welcome back — ${college}`);
@@ -131,7 +135,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
 
 /* -------------------------------- Console -------------------------------- */
 
-type Tab = "enrollments" | "broadcast" | "leave" | "analytics" | "syllabus";
+type Tab = "enrollments" | "broadcast" | "leave" | "analytics";
 
 function AdminConsole({ onSignOut }: { onSignOut: () => void }) {
   const [tab, setTab] = useState<Tab>("enrollments");
@@ -160,14 +164,13 @@ function AdminConsole({ onSignOut }: { onSignOut: () => void }) {
         </div>
 
         <h1 className="mt-6 text-3xl md:text-4xl font-black tracking-tight">Admin Dashboard</h1>
-        <p className="text-sm text-white/60">Enrollments, broadcasts, leave approvals, analytics & syllabus CMS.</p>
+        <p className="text-sm text-white/60">Enrollments, broadcasts, leave approvals & analytics.</p>
 
         <nav className="mt-6 flex flex-wrap gap-2">
           <TabBtn active={tab === "enrollments"} onClick={() => setTab("enrollments")} icon={<ClipboardList className="w-3.5 h-3.5" />} label="Enrollments" />
           <TabBtn active={tab === "broadcast"} onClick={() => setTab("broadcast")} icon={<Megaphone className="w-3.5 h-3.5" />} label="Broadcast" />
           <TabBtn active={tab === "leave"} onClick={() => setTab("leave")} icon={<CalendarClock className="w-3.5 h-3.5" />} label="Leave Approvals" />
           <TabBtn active={tab === "analytics"} onClick={() => setTab("analytics")} icon={<BarChart3 className="w-3.5 h-3.5" />} label="Analytics" />
-          <TabBtn active={tab === "syllabus"} onClick={() => setTab("syllabus")} icon={<BookOpen className="w-3.5 h-3.5" />} label="Upload Syllabus" />
         </nav>
 
         <div className="mt-5 animate-in fade-in duration-200" key={tab}>
@@ -175,7 +178,6 @@ function AdminConsole({ onSignOut }: { onSignOut: () => void }) {
           {tab === "broadcast" && <BroadcastPanel />}
           {tab === "leave" && <LeavePanel />}
           {tab === "analytics" && <AnalyticsPanel />}
-          {tab === "syllabus" && <SyllabusPanel />}
         </div>
       </div>
     </div>
@@ -504,148 +506,6 @@ function StatCard({ label, value, icon, accent }: { label: string; value: React.
       <div className="min-w-0">
         <p className="text-[10px] font-bold uppercase tracking-widest text-white/50">{label}</p>
         <p className="text-2xl font-black leading-tight">{value}</p>
-      </div>
-    </div>
-  );
-}
-
-/* ----------------------------- Syllabus Tab ----------------------------- */
-
-interface SyllabusRow {
-  id: string; title: string; subject: string; file_url: string; created_at: string;
-}
-
-function SyllabusPanel() {
-  const [subject, setSubject] = useState<string>("");
-  const [busy, setBusy] = useState(false);
-  const [items, setItems] = useState<SyllabusRow[]>([]);
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    let active = true;
-    async function load() {
-      const { data } = await supabase
-        .from("learning_materials")
-        .select("id, title, subject, file_url, created_at")
-        .eq("module", SYLLABUS_MODULE_TAG)
-        .order("created_at", { ascending: false });
-      if (active) setItems((data ?? []) as SyllabusRow[]);
-    }
-    load();
-    const ch = supabase
-      .channel("admin:syllabus")
-      .on("postgres_changes", { event: "*", schema: "public", table: "learning_materials" }, () => load())
-      .subscribe();
-    return () => { active = false; supabase.removeChannel(ch); };
-  }, []);
-
-  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file) return;
-    if (!subject) { toast.error("Choose a subject first"); return; }
-    if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
-      toast.error("Only .pdf files are accepted");
-      return;
-    }
-    setBusy(true);
-    try {
-      const path = `syllabus/${subject.replace(/\W+/g, "-").toLowerCase()}-${Date.now()}.pdf`;
-      const { error: upErr } = await supabase.storage
-        .from("student-documents")
-        .upload(path, file, { contentType: "application/pdf", upsert: true });
-      if (upErr) throw upErr;
-      const { data: signed, error: sErr } = await supabase.storage
-        .from("student-documents")
-        .createSignedUrl(path, 60 * 60 * 24 * 365);
-      if (sErr || !signed?.signedUrl) throw sErr ?? new Error("Failed to sign URL");
-
-      // Remove any existing syllabus for this subject then insert the new one.
-      await supabase
-        .from("learning_materials")
-        .delete()
-        .eq("module", SYLLABUS_MODULE_TAG)
-        .eq("subject", subject);
-
-      const { error: insErr } = await supabase.from("learning_materials").insert({
-        title: `${subject} — Syllabus`,
-        subject,
-        module: SYLLABUS_MODULE_TAG,
-        file_url: signed.signedUrl,
-      });
-      if (insErr) throw insErr;
-      toast.success(`Syllabus published for ${subject}`);
-    } catch (err) {
-      console.warn(err);
-      toast.error("Upload failed. Please try again.");
-    } finally { setBusy(false); }
-  }
-
-  async function remove(id: string) {
-    const { error } = await supabase.from("learning_materials").delete().eq("id", id);
-    if (error) { toast.error("Delete failed"); return; }
-    toast.success("Syllabus removed");
-  }
-
-  const uploaded = new Set(items.map((i) => i.subject));
-
-  return (
-    <div className="space-y-5">
-      <div className="rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl p-5">
-        <h2 className="text-base font-bold flex items-center gap-2"><BookOpen className="w-4 h-4 text-fuchsia-300" /> Upload Syllabus</h2>
-        <p className="text-xs text-white/60 mt-0.5">Only <code className="text-fuchsia-300">.pdf</code> files. One current syllabus per subject.</p>
-
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 items-end">
-          <div>
-            <label className="text-[11px] font-bold uppercase tracking-widest text-white/60">Subject</label>
-            <select value={subject} onChange={(e) => setSubject(e.target.value)}
-              className="mt-1.5 w-full h-12 px-3 rounded-xl bg-white/5 border border-white/10 text-sm font-semibold outline-none focus:border-fuchsia-400">
-              <option value="" className="bg-slate-900">— Select subject —</option>
-              {SYLLABUS_SUBJECTS.map((s) => (
-                <option key={s} value={s} className="bg-slate-900">
-                  {s}{uploaded.has(s) ? " · already uploaded" : ""}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <input ref={fileRef} type="file" accept="application/pdf,.pdf" className="hidden" onChange={onFile} />
-            <button onClick={() => fileRef.current?.click()} disabled={busy || !subject}
-              className="h-12 px-5 rounded-xl bg-gradient-to-r from-fuchsia-500 to-rose-500 font-bold text-sm flex items-center justify-center gap-2 shadow-lg active:scale-[0.98] transition disabled:opacity-50">
-              {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading…</> : <><Upload className="w-4 h-4" /> Choose PDF</>}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <h3 className="text-xs font-bold uppercase tracking-widest text-white/50 mb-2">Published syllabi · {items.length}</h3>
-        {items.length === 0 ? (
-          <div className="rounded-2xl bg-white/5 border border-white/10 p-8 text-center text-white/50 text-sm">
-            No syllabi uploaded yet.
-          </div>
-        ) : (
-          <div className="rounded-2xl bg-white/5 border border-white/10 divide-y divide-white/5 overflow-hidden">
-            {items.map((m) => (
-              <div key={m.id} className="flex items-center gap-3 px-4 py-3">
-                <FileText className="w-4 h-4 text-fuchsia-300 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate">{m.subject}</p>
-                  <p className="text-[10px] text-white/50">{formatISTDate(m.created_at)}</p>
-                </div>
-                <a href={m.file_url} target="_blank" rel="noreferrer"
-                  className="text-xs font-bold px-3 py-1.5 rounded-lg bg-white/10 border border-white/10 hover:bg-white/15">
-                  Open
-                </a>
-                <button onClick={() => remove(m.id)}
-                  className="w-8 h-8 rounded-lg grid place-items-center text-white/50 hover:text-rose-300 hover:bg-rose-500/10"
-                  aria-label="Delete">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
