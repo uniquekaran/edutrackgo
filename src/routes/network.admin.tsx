@@ -50,11 +50,13 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
       return;
     }
     setBusy(true);
-    // Sign into Supabase as admin too, so RLS-protected uploads (learning_materials, storage) succeed.
+    // Clean any prior Supabase session (prevents teacher↔admin bleeding).
+    try { await supabase.auth.signOut(); } catch {}
+    // Sign into Supabase as admin so RLS-protected reviews and writes succeed.
     try {
       await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD });
     } catch (err) {
-      console.warn("Supabase admin sign-in failed; syllabus uploads may be restricted.", err);
+      console.warn("Supabase admin sign-in failed; some writes may be restricted.", err);
     }
     try { localStorage.setItem(AUTH_KEY, "1"); } catch {}
     toast.success(`Welcome back — ${college}`);
