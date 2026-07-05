@@ -166,14 +166,13 @@ function AdminConsole({ onSignOut }: { onSignOut: () => void }) {
         </div>
 
         <h1 className="mt-6 text-3xl md:text-4xl font-black tracking-tight">Admin Dashboard</h1>
-        <p className="text-sm text-white/60">Enrollments, broadcasts, leave approvals, analytics & syllabus CMS.</p>
+        <p className="text-sm text-white/60">Enrollments, broadcasts, leave approvals & analytics.</p>
 
         <nav className="mt-6 flex flex-wrap gap-2">
           <TabBtn active={tab === "enrollments"} onClick={() => setTab("enrollments")} icon={<ClipboardList className="w-3.5 h-3.5" />} label="Enrollments" />
           <TabBtn active={tab === "broadcast"} onClick={() => setTab("broadcast")} icon={<Megaphone className="w-3.5 h-3.5" />} label="Broadcast" />
           <TabBtn active={tab === "leave"} onClick={() => setTab("leave")} icon={<CalendarClock className="w-3.5 h-3.5" />} label="Leave Approvals" />
           <TabBtn active={tab === "analytics"} onClick={() => setTab("analytics")} icon={<BarChart3 className="w-3.5 h-3.5" />} label="Analytics" />
-          <TabBtn active={tab === "syllabus"} onClick={() => setTab("syllabus")} icon={<BookOpen className="w-3.5 h-3.5" />} label="Upload Syllabus" />
         </nav>
 
         <div className="mt-5 animate-in fade-in duration-200" key={tab}>
@@ -181,7 +180,6 @@ function AdminConsole({ onSignOut }: { onSignOut: () => void }) {
           {tab === "broadcast" && <BroadcastPanel />}
           {tab === "leave" && <LeavePanel />}
           {tab === "analytics" && <AnalyticsPanel />}
-          {tab === "syllabus" && <SyllabusPanel />}
         </div>
       </div>
     </div>
