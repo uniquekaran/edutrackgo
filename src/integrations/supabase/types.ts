@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      colleges: {
+        Row: {
+          city: string | null
+          created_at: string
+          id: string
+          name: string
+          state: string | null
+          type: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          state?: string | null
+          type?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          state?: string | null
+          type?: string | null
+        }
+        Relationships: []
+      }
       documents: {
         Row: {
           created_at: string

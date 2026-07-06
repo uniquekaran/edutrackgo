@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, Check, ChevronDown } from "lucide-react";
+import { Search, Check, ChevronDown, Loader2 } from "lucide-react";
 import { COLLEGES } from "@/lib/colleges";
+import { searchColleges } from "@/lib/colleges-db";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -14,7 +15,10 @@ interface Props {
 export function CollegeSelect({ value, onChange, label = "College Name", placeholder = "Search verified institutions…", className }: Props) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState(value);
+  const [results, setResults] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const seq = useRef(0);
 
   useEffect(() => { setQ(value); }, [value]);
 
@@ -26,11 +30,26 @@ export function CollegeSelect({ value, onChange, label = "College Name", placeho
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
 
-  const results = useMemo(() => {
+  // Debounced remote search with static fallback
+  useEffect(() => {
+    if (!open) return;
+    const mySeq = ++seq.current;
+    setLoading(true);
+    const t = setTimeout(async () => {
+      const list = await searchColleges(q, 40);
+      if (mySeq === seq.current) {
+        setResults(list);
+        setLoading(false);
+      }
+    }, 180);
+    return () => clearTimeout(t);
+  }, [q, open]);
+
+  const initialFallback = useMemo(() => {
     const needle = q.trim().toLowerCase();
-    if (!needle) return COLLEGES.slice(0, 30);
-    return COLLEGES.filter((c) => c.toLowerCase().includes(needle)).slice(0, 30);
+    return (needle ? COLLEGES.filter((c) => c.toLowerCase().includes(needle)) : COLLEGES).slice(0, 40);
   }, [q]);
+  const list = results.length > 0 ? results : initialFallback;
 
   function pick(c: string) {
     onChange(c);
@@ -52,17 +71,32 @@ export function CollegeSelect({ value, onChange, label = "College Name", placeho
           placeholder={placeholder}
           className="w-full h-11 pl-9 pr-9 rounded-xl bg-secondary outline-none text-sm font-semibold border border-transparent focus:border-primary focus:bg-surface transition-all"
         />
-        <ChevronDown
-          onClick={() => setOpen((o) => !o)}
-          className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer"
-        />
+        {loading ? (
+          <Loader2 className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground animate-spin" />
+        ) : (
+          <ChevronDown
+            onClick={() => setOpen((o) => !o)}
+            className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer"
+          />
+        )}
       </div>
       {open && (
         <div className="absolute z-40 mt-1.5 left-0 right-0 max-h-64 overflow-y-auto rounded-2xl glass-strong neon-border shadow-elevated p-1">
-          {results.length === 0 && (
-            <p className="px-3 py-4 text-xs text-muted-foreground text-center">No matching institution. Pick "Other".</p>
+          {list.length === 0 && !loading && (
+            <div className="px-3 py-3">
+              <p className="text-xs text-muted-foreground text-center mb-2">No matching institution.</p>
+              {q.trim().length > 2 && (
+                <button
+                  type="button"
+                  onClick={() => pick(q.trim())}
+                  className="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold bg-primary/10 hover:bg-primary/20"
+                >
+                  Use "{q.trim()}"
+                </button>
+              )}
+            </div>
           )}
-          {results.map((c) => (
+          {list.map((c) => (
             <button
               key={c}
               type="button"
