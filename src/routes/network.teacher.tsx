@@ -51,7 +51,11 @@ function TeacherLogin({ onSuccess }: { onSuccess: () => void }) {
       return;
     }
     setBusy(true);
-    // Clean any prior Supabase session (prevents admin↔teacher bleeding).
+    // Clean any prior Supabase session AND any admin/legacy portal keys.
+    try {
+      localStorage.removeItem("eduai-network-admin-authed");
+      localStorage.removeItem("eduai-network-authed"); // legacy shared key
+    } catch {}
     try { await supabase.auth.signOut(); } catch {}
     // Sign in as the upstream uploader so RLS-protected syllabus writes succeed.
     try {

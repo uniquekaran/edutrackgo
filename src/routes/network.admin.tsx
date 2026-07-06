@@ -49,7 +49,11 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
       return;
     }
     setBusy(true);
-    // Clean any prior Supabase session (prevents teacher↔admin bleeding).
+    // Clean any prior Supabase session AND any teacher/legacy portal keys.
+    try {
+      localStorage.removeItem("eduai-network-teacher-authed");
+      localStorage.removeItem("eduai-network-authed"); // legacy shared key
+    } catch {}
     try { await supabase.auth.signOut(); } catch {}
     // Sign into Supabase as admin so RLS-protected reviews and writes succeed.
     try {
