@@ -2,11 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft, Check, X, Eye, ShieldCheck, Search, Inbox, Lock, Building2, Mail, KeyRound,
-  Loader2, Users, ClipboardList, Megaphone, BarChart3, CalendarClock, Send,
+  Loader2, Users, ClipboardList, Megaphone, BarChart3, CalendarClock, Send, Database,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useNetStore, approveRequest, rejectRequest, type EnrollmentRequest } from "@/lib/network-state";
 import { useLeaves, approveLeave, rejectLeave } from "@/lib/leave-state";
+import { CollegesImporter } from "@/components/CollegesImporter";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/network/admin")({
@@ -135,7 +136,7 @@ function AdminLogin({ onSuccess }: { onSuccess: () => void }) {
 
 /* -------------------------------- Console -------------------------------- */
 
-type Tab = "enrollments" | "broadcast" | "leave" | "analytics";
+type Tab = "enrollments" | "broadcast" | "leave" | "analytics" | "colleges";
 
 function AdminConsole({ onSignOut }: { onSignOut: () => void }) {
   const [tab, setTab] = useState<Tab>("enrollments");
@@ -168,6 +169,7 @@ function AdminConsole({ onSignOut }: { onSignOut: () => void }) {
 
         <nav className="mt-6 flex flex-wrap gap-2">
           <TabBtn active={tab === "enrollments"} onClick={() => setTab("enrollments")} icon={<ClipboardList className="w-3.5 h-3.5" />} label="Enrollments" />
+          <TabBtn active={tab === "colleges"} onClick={() => setTab("colleges")} icon={<Database className="w-3.5 h-3.5" />} label="Colleges CSV" />
           <TabBtn active={tab === "broadcast"} onClick={() => setTab("broadcast")} icon={<Megaphone className="w-3.5 h-3.5" />} label="Broadcast" />
           <TabBtn active={tab === "leave"} onClick={() => setTab("leave")} icon={<CalendarClock className="w-3.5 h-3.5" />} label="Leave Approvals" />
           <TabBtn active={tab === "analytics"} onClick={() => setTab("analytics")} icon={<BarChart3 className="w-3.5 h-3.5" />} label="Analytics" />
@@ -175,6 +177,7 @@ function AdminConsole({ onSignOut }: { onSignOut: () => void }) {
 
         <div className="mt-5 animate-in fade-in duration-200" key={tab}>
           {tab === "enrollments" && <EnrollmentsPanel />}
+          {tab === "colleges" && <CollegesImporter />}
           {tab === "broadcast" && <BroadcastPanel />}
           {tab === "leave" && <LeavePanel />}
           {tab === "analytics" && <AnalyticsPanel />}
